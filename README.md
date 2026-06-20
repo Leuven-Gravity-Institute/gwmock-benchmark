@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/isaac-cf-wong/gwmock-benchmark/graph/badge.svg?token=COF8341N60)](https://codecov.io/gh/isaac-cf-wong/gwmock-benchmark)
 [![PyPI Version](https://img.shields.io/pypi/v/package-name-placeholder)](https://pypi.org/project/package-name-placeholder/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/package-name-placeholder)](https://pypi.org/project/package-name-placeholder/)
-[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](LICENSE)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![DOI](https://zenodo.org/badge/924023559.svg)](https://doi.org/10.5281/zenodo.18017404)
 [![SPEC 0 — Minimum Supported Dependencies](https://img.shields.io/badge/SPEC-0-green?labelColor=%23004811&color=%235CA038)](https://scientific-python.org/specs/spec-0000/)

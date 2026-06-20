@@ -163,7 +163,7 @@ more fixes (no type/scope)
 ## Licensing
 
 By contributing, you agree that your contributions will be licensed under the
-project’s 3-Clause BSD License.
+project’s GNU General Public License v3 or later (GPL-3.0-or-later).
 
 ---
 
