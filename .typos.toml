@@ -18,3 +18,8 @@ extend-ignore-re = [
   # next line with potential false positive
   "(<!--|#|//)\\s*typos:ignore-next-line\\s*.*?(-->)?\\n.*",
 ]
+
+[default.extend-words]
+# gravitational-wave term (spin precession), not a misspelling of "processing"
+precessing = "precessing"
+precession = "precession"
