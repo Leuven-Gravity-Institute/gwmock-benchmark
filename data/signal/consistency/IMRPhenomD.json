@@ -1,19 +1,22 @@
 {
     "configuration": {
+        "distance": 400.0,
         "minimum_frequency": 20.0,
-        "n_matches": 6
+        "n_overlaps": 6,
+        "sampling_frequency": 2048.0
     },
     "label": "IMRPhenomD",
     "metrics": {
-        "median_match": 0.9997461036982497,
-        "min_match": 0.9994584995160065
+        "median_overlap": 0.9999999866262037,
+        "min_overlap": 0.999999966862766
     },
     "package": "gwmock-signal",
     "provenance": {
-        "cpu_model": "AMD EPYC 7643 48-Core Processor",
+        "cpu_model": "Intel(R) N150",
         "gpu_models": [],
-        "gwmock_benchmark_version": null,
+        "gwmock_benchmark_version": "0.1.dev16+ge013a3e8a",
         "library_versions": {
+            "gwmock-benchmark": "0.1.dev16+ge013a3e8a",
             "gwmock-signal": "0.9.0",
             "gwpy": "4.0.1",
             "jax": "0.10.2",
@@ -27,8 +30,8 @@
         "n_gpus": 0,
         "package": "gwmock-signal",
         "package_version": "0.9.0",
-        "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
-        "python_version": "3.13.2"
+        "platform": "Linux-6.8.0-111-generic-x86_64-with-glibc2.39",
+        "python_version": "3.14.3"
     },
     "schema_version": 1,
     "suite": "consistency"
