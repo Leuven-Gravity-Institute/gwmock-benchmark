@@ -39,6 +39,11 @@ Keep the **settings comparable** to the existing records (same `--n-events`,
 approximant, etc.) so your numbers line up on the charts; vary only the
 hardware.
 
+Optionally add `--contributor <your-github-handle>` so your handle appears (as a
+link) in the results table — handy if a maintainer has a question about your
+run. It is **voluntary contact metadata**, published with the record on the
+public site; omit it if you'd rather not.
+
 ### On a cluster
 
 Generate a submission script for your scheduler and submit it:

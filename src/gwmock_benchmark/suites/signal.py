@@ -226,6 +226,7 @@ def run_performance(  # noqa: PLR0913
     n_cpu_cores: int | None = None,
     n_gpus: int | None = None,
     label: str | None = None,
+    contributor: str | None = None,
     write_data: bool = False,
     max_product_gb: float = 8.0,
 ) -> dict:
@@ -287,7 +288,9 @@ def run_performance(  # noqa: PLR0913
         cold = run_once(write_dir)
         warm = run_once(write_dir)
 
-    prov = provenance(package=PACKAGE, libraries=_LIBRARIES, n_cpu_cores=n_cpu_cores, n_gpus=n_gpus)
+    prov = provenance(
+        package=PACKAGE, libraries=_LIBRARIES, n_cpu_cores=n_cpu_cores, n_gpus=n_gpus, contributor=contributor
+    )
 
     def _per_second(wall: float) -> float | None:
         return n_events / wall if wall else None
@@ -393,6 +396,7 @@ def run_consistency(  # noqa: PLR0913 - each measurement knob is an explicit key
     distance: float = 400.0,
     n_cpu_cores: int | None = None,
     n_gpus: int | None = None,
+    contributor: str | None = None,
 ) -> list[dict]:
     """Measure the ripple-vs-LAL frequency-domain overlap for every supported approximant.
 
@@ -407,7 +411,9 @@ def run_consistency(  # noqa: PLR0913 - each measurement knob is an explicit key
 
     ripple_backend = RippleBackend()
 
-    prov = provenance(package=PACKAGE, libraries=_LIBRARIES, n_cpu_cores=n_cpu_cores, n_gpus=n_gpus)
+    prov = provenance(
+        package=PACKAGE, libraries=_LIBRARIES, n_cpu_cores=n_cpu_cores, n_gpus=n_gpus, contributor=contributor
+    )
     records: list[dict] = []
     for approximant, configs in _FAMILIES.items():
         f_min = tidal_minimum_frequency if approximant in _TIDAL else minimum_frequency
@@ -482,12 +488,39 @@ def _short_device(name: str) -> str:
     return re.sub(r"\s+", " ", name).strip()
 
 
-def _html_table(headers: list[str], rows: list[list]) -> str:
-    """Return an HTML table (class ``benchmark-table``) enhanced client-side to sort/filter."""
+def _contributor_cell(record: dict) -> str:
+    """Return a linked ``@handle`` (to the GitHub profile) for the record's contributor.
+
+    Empty when no handle was recorded. The handle is validated on contribution
+    (:func:`gwmock_benchmark.harness.check_provenance`), and escaped here regardless,
+    so the cell is safe to emit as raw HTML.
+    """
+    import html
+
+    handle = (record["provenance"].get("contributor") or "").lstrip("@")
+    if not handle:
+        return ""
+    safe = html.escape(handle)
+    return f'<a href="https://github.com/{safe}" rel="nofollow noopener">@{safe}</a>'
+
+
+def _html_table(headers: list[str], rows: list[list], *, raw_headers: frozenset[str] = frozenset()) -> str:
+    """Return an HTML table (class ``benchmark-table``) enhanced client-side to sort/filter.
+
+    Cells under a header in ``raw_headers`` are emitted verbatim (the caller is
+    responsible for escaping them); every other cell is HTML-escaped.
+    """
     import html
 
     head = "".join(f"<th>{html.escape(str(h))}</th>" for h in headers)
-    body = "\n".join("<tr>" + "".join(f"<td>{html.escape(str(cell))}</td>" for cell in row) + "</tr>" for row in rows)
+    raw_flags = [header in raw_headers for header in headers]
+    body_rows = []
+    for row in rows:
+        cells = "".join(
+            f"<td>{cell if raw else html.escape(str(cell))}</td>" for cell, raw in zip(row, raw_flags, strict=False)
+        )
+        body_rows.append(f"<tr>{cells}</tr>")
+    body = "\n".join(body_rows)
     return f'<table class="benchmark-table">\n<thead><tr>{head}</tr></thead>\n<tbody>\n{body}\n</tbody>\n</table>\n'
 
 
@@ -504,6 +537,7 @@ def _performance_table(records: list[dict]) -> str:
         "compile (s)",
         "peak mem (GB)",
         "output (GB)",
+        "contributor",
     ]
     rows = [
         [
@@ -517,10 +551,11 @@ def _performance_table(records: list[dict]) -> str:
             f"{_metric(record, 'compile_seconds'):.1f}",
             f"{_metric(record, 'peak_rss_bytes') / 1e9:.1f}",
             f"{_metric(record, 'output_bytes') / 1e9:.2f}",
+            _contributor_cell(record),
         ]
         for record in records
     ]
-    return _html_table(headers, rows)
+    return _html_table(headers, rows, raw_headers=frozenset({"contributor"}))
 
 
 def _log_overlap_loss(overlap: float) -> float:

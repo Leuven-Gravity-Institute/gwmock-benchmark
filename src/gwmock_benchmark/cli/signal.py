@@ -35,6 +35,9 @@ def performance(  # noqa: PLR0913
     n_cpu_cores: Annotated[int | None, typer.Option(help="Override allocated CPU cores.")] = None,
     n_gpus: Annotated[int | None, typer.Option(help="Override allocated GPUs.")] = None,
     label: Annotated[str | None, typer.Option(help="Human-readable run label.")] = None,
+    contributor: Annotated[
+        str | None, typer.Option(help="Your GitHub handle, shown in the results table for contact.")
+    ] = None,
     write_data: Annotated[bool, typer.Option("--write-data", help="Write segments to size on disk.")] = False,
     max_product_gb: Annotated[float, typer.Option(help="Refuse runs whose product exceeds this.")] = 8.0,
 ) -> None:
@@ -59,6 +62,7 @@ def performance(  # noqa: PLR0913
             n_cpu_cores=n_cpu_cores,
             n_gpus=n_gpus,
             label=label,
+            contributor=contributor,
             write_data=write_data,
             max_product_gb=max_product_gb,
         )
@@ -83,6 +87,7 @@ def consistency(  # noqa: PLR0913 - CLI options map one-to-one to suite knobs
     distance: Annotated[float, typer.Option(help="Luminosity distance [Mpc].")] = 400.0,
     n_cpu_cores: Annotated[int | None, typer.Option(help="Override allocated CPU cores.")] = None,
     n_gpus: Annotated[int | None, typer.Option(help="Override allocated GPUs.")] = None,
+    contributor: Annotated[str | None, typer.Option(help="Your GitHub handle, recorded for contact.")] = None,
 ) -> None:
     """Run the ripple-vs-LAL match per approximant; write one record per approximant."""
     from gwmock_benchmark.harness import write_record
@@ -95,6 +100,7 @@ def consistency(  # noqa: PLR0913 - CLI options map one-to-one to suite knobs
         distance=distance,
         n_cpu_cores=n_cpu_cores,
         n_gpus=n_gpus,
+        contributor=contributor,
     )
     for record in records:
         path = write_record(output_dir / f"{record['label']}.json", record)

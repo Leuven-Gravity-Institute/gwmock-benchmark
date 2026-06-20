@@ -12,6 +12,10 @@ because the run happens on hardware the project does not control.
 from __future__ import annotations
 
 import math
+import re
+
+# GitHub handle: 1-39 chars, alphanumeric or single hyphens, no leading/trailing/double hyphen.
+_GITHUB_HANDLE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$")
 
 
 def close(measured: float, expected: float, *, rel_tol: float = 1e-3, abs_tol: float = 1e-9) -> bool:
@@ -52,4 +56,10 @@ def check_provenance(record: dict) -> list[str]:
         problems.append("provenance.platform is missing")
     if not prov.get("python_version"):
         problems.append("provenance.python_version is missing")
+
+    # Optional: a contributor handle, if present, must be a plausible GitHub username
+    # (it is published verbatim and rendered as a profile link).
+    contributor = prov.get("contributor")
+    if contributor is not None and not _GITHUB_HANDLE.match(str(contributor).lstrip("@")):
+        problems.append(f"provenance.contributor {contributor!r} is not a valid GitHub handle")
     return problems

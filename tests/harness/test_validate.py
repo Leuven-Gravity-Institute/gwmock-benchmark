@@ -52,3 +52,20 @@ def test_close_tolerates_rounding_but_not_disagreement():
     is_mismatch_close = close(2098.0, 419.6)
     assert is_close
     assert not is_mismatch_close
+
+
+def test_valid_contributor_handle_allowed():
+    """A plausible GitHub handle passes (and a leading '@' is tolerated)."""
+    assert check_provenance(_provenance(contributor="octo-cat")) == []
+    assert check_provenance(_provenance(contributor="@octocat")) == []
+
+
+def test_absent_contributor_allowed():
+    """The contributor handle is optional."""
+    assert check_provenance(_provenance(contributor=None)) == []
+
+
+def test_invalid_contributor_handle_flagged():
+    """A malformed handle (spaces, leading/trailing hyphen) is reported."""
+    assert any("contributor" in p for p in check_provenance(_provenance(contributor="not a handle")))
+    assert any("contributor" in p for p in check_provenance(_provenance(contributor="-bad")))
