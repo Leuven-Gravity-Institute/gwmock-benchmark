@@ -130,7 +130,6 @@
                     sort: modelSort(def),
                     axis: X_AXIS,
                 },
-                xOffset: { field: 'cell' },
                 y: { field: 'value', type: 'quantitative', title: def.y },
                 color: { field: 'cell', type: 'nominal', title: null },
                 shape: {
@@ -185,7 +184,6 @@
                     sort: modelSort(def),
                     axis: X_AXIS,
                 },
-                xOffset: { field: 'cell' },
                 y: { field: 'value', type: 'quantitative', title: def.y },
                 color: { field: 'cell', type: 'nominal', title: null },
                 opacity: {
