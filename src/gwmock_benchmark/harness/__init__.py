@@ -7,6 +7,7 @@ dependencies and imports cleanly without any optional package installed.
 from __future__ import annotations
 
 from gwmock_benchmark.harness.measure import ResourceUsage, measure
+from gwmock_benchmark.harness.plotting import grouped_bar, single_bar
 from gwmock_benchmark.harness.provenance import allocated_cpu_cores, provenance
 from gwmock_benchmark.harness.record import (
     MAX_RECORD_BYTES,
@@ -23,12 +24,14 @@ __all__ = [
     "SCHEMA_VERSION",
     "ResourceUsage",
     "allocated_cpu_cores",
+    "grouped_bar",
     "load_records",
     "make_record",
     "measure",
     "provenance",
     "render_htcondor",
     "render_slurm",
+    "single_bar",
     "validate_record",
     "walltime_to_seconds",
     "write_record",

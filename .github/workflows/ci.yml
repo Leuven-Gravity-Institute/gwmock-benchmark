@@ -26,7 +26,8 @@ jobs:
                   enable-cache: 'true'
 
             - name: Install dependencies
-              run: uv sync --group dev --frozen
+              # docs group brings matplotlib so the aggregate/render tests run here.
+              run: uv sync --group dev --group docs --frozen
 
             - name: Run tests with pytest
               run: uv run --frozen pytest

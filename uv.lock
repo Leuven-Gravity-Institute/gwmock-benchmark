@@ -704,6 +704,7 @@ dev = [
     { name = "ruff" },
 ]
 docs = [
+    { name = "matplotlib" },
     { name = "mkdocstrings-python" },
     { name = "zensical" },
 ]
@@ -729,6 +730,7 @@ dev = [
     { name = "ruff", specifier = ">=0.15.17" },
 ]
 docs = [
+    { name = "matplotlib", specifier = ">=3.9" },
     { name = "mkdocstrings-python", specifier = ">=2.0.4" },
     { name = "zensical", specifier = ">=0.0.45" },
 ]

@@ -133,3 +133,7 @@ dmypy.json
 
 # Node.js
 node_modules/
+
+# Generated benchmark figures and table snippets (built from data/ by `aggregate`)
+docs/*/figures/
+docs/*/generated/
