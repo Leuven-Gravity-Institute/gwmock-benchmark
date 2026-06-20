@@ -20,6 +20,10 @@ discrepancy lowers the overlap rather than being optimized away. Results are
 reported as **`log₁₀` overlap loss** (`log₁₀(1 − overlap)`); more negative is
 better, and ≈ −15 is machine precision.
 
+The chart plots both the **worst-case** and **median** loss per waveform model,
+with models sorted so the **best (most negative worst case) is on the left**.
+The `gwmock-signal` version is shown in the tooltip and the table.
+
 `TaylorF2` is omitted here (covered in the gwmock-signal test suite). This is a
 numerical property of the waveforms, independent of the hardware that computed
 it.
