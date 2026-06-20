@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "gwmock_benchmark"
+name = "gwmock-benchmark"
 authors = [{ name = "Isaac C. F. Wong" }]
 description = "Shared benchmarking harness, results, and reports for the gwmock packages"
 readme = "README.md"
