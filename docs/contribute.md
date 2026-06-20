@@ -68,15 +68,27 @@ gwmock-benchmark submit slurm \
 ## 4. Check it builds (optional but encouraged)
 
 ```bash
-uv run pytest tests/test_data.py          # validates every record (schema, size, no hostname)
+gwmock-benchmark validate --data-dir data   # the same check CI runs (see below)
+uv run pytest tests/test_data.py            # schema, size, no hostname + internal consistency
 uv run --group docs gwmock-benchmark aggregate   # render figures + tables
-uv run --group docs zensical serve        # preview the site locally
+uv run --group docs zensical serve          # preview the site locally
 ```
 
 ## 5. Open a pull request
 
-Commit your new `data/...json` file(s) and open a PR. CI validates the records;
-once merged, the next docs deploy regenerates the figures and tables with your
-hardware included.
+Commit your new `data/...json` file(s) and open a PR. CI runs
+`gwmock-benchmark validate` on every record; once merged, the next docs deploy
+regenerates the figures and tables with your hardware included.
+
+!!! info "What validation checks (and what it can't)"
+
+    The records you submit are produced on your own hardware, so this is a
+    **trust-based** contribution model. CI does **not** re-run your benchmark; it
+    checks that each record is well-formed, has complete provenance, and that its
+    **derived metrics still agree with the primitives** they were computed from —
+    e.g. `events_per_second == n_events / wall_seconds`, `compile == cold − warm`,
+    and the output size matches the configured data product. That catches
+    accidental errors and hand-edited numbers, but cannot detect a fully
+    self-consistent fabricated record. Please submit numbers from real runs.
 
 Thanks for contributing!
