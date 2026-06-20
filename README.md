@@ -1,7 +1,11 @@
 # gwmock-benchmark
 
 [![Python CI](https://github.com/Leuven-Gravity-Institute/gwmock-benchmark/actions/workflows/ci.yml/badge.svg)](https://github.com/Leuven-Gravity-Institute/gwmock-benchmark/actions/workflows/ci.yml)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/Leuven-Gravity-Institute/gwmock-benchmark/main.svg)](https://results.pre-commit.ci/latest/github/Leuven-Gravity-Institute/gwmock-benchmark/main)
 [![Documentation](https://github.com/Leuven-Gravity-Institute/gwmock-benchmark/actions/workflows/documentation.yml/badge.svg)](https://leuven-gravity-institute.github.io/gwmock-benchmark/)
+[![codecov](https://codecov.io/gh/Leuven-Gravity-Institute/gwmock-benchmark/graph/badge.svg?token=24BQ7UOGOY)](https://codecov.io/gh/Leuven-Gravity-Institute/gwmock-benchmark)
+[![PyPI Version](https://img.shields.io/pypi/v/gwmock-benchmark)](https://pypi.org/project/gwmock-benchmark/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/gwmock-benchmark)](https://pypi.org/project/gwmock-benchmark/)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![SPEC 0 — Minimum Supported Dependencies](https://img.shields.io/badge/SPEC-0-green?labelColor=%23004811&color=%235CA038)](https://scientific-python.org/specs/spec-0000/)
