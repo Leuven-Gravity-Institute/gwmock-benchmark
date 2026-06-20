@@ -96,7 +96,8 @@ def provenance(
         "library_versions": library_versions,
         "python_version": platform.python_version(),
         "platform": platform.platform(),
-        "hostname": platform.node(),
+        # Hostname is deliberately NOT recorded: records are committed publicly and a
+        # node name would leak the cluster. Hardware identity lives in cpu/gpu models.
         "cpu_model": _cpu_model(),
         "gpu_models": gpu_models,
         "n_cpu_cores": n_cpu_cores if n_cpu_cores is not None else allocated_cpu_cores(),
