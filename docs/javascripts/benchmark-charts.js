@@ -34,9 +34,9 @@
             xField: 'approximant',
             charts: [
                 {
-                    title: 'ripple vs LAL — worst-case match',
-                    y: 'match',
-                    value: 'worst',
+                    title: 'ripple vs LAL — worst-case overlap loss (lower is better)',
+                    y: 'log₁₀(1 − overlap)',
+                    value: 'worst_log_loss',
                 },
             ],
         },

@@ -12,15 +12,17 @@ backend is an alternative implementation of the same waveform models LAL
 provides. This page tracks their agreement so the JAX/GPU path can be trusted
 against the LAL baseline.
 
-For every approximant LAL implements in the time domain, the white,
-time/phase-maximized **match** between the ripple and LAL backends is computed
-across several parameter sets; the **worst-case** and **median** match per
-approximant are recorded. `TaylorF2` is omitted here (LAL provides no
-time-domain TaylorF2) and is covered against LAL's frequency-domain TaylorF2 in
-the gwmock-signal test suite.
+For every approximant, the **frequency-domain overlap** between the ripple and
+LAL waveforms is computed across several parameter sets on a shared frequency
+grid and `f_ref`. The overlap uses `Re(⟨a,b⟩)` with **no time or phase
+maximization** — the implementations must agree exactly, so any residual
+discrepancy lowers the overlap rather than being optimized away. Results are
+reported as **`log₁₀` overlap loss** (`log₁₀(1 − overlap)`); more negative is
+better, and ≈ −15 is machine precision.
 
-The match is a numerical property of the waveforms, independent of the hardware
-that computed it.
+`TaylorF2` is omitted here (covered in the gwmock-signal test suite). This is a
+numerical property of the waveforms, independent of the hardware that computed
+it.
 
 --8<-- "docs/signal/generated/consistency-charts.md"
 

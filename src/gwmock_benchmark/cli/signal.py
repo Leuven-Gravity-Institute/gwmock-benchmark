@@ -98,4 +98,4 @@ def consistency(  # noqa: PLR0913 - CLI options map one-to-one to suite knobs
     )
     for record in records:
         path = write_record(output_dir / f"{record['label']}.json", record)
-        typer.echo(f"{record['label']}: min={record['metrics']['min_match']:.5f} -> {path}")
+        typer.echo(f"{record['label']}: worst overlap={record['metrics']['min_overlap']:.6f} -> {path}")

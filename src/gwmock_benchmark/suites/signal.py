@@ -6,8 +6,8 @@ Two workloads:
 - **performance** — generate a CBC catalogue data product for one
   backend/method/hardware cell, timing a *cold* (incl. JIT/XLA compile) and a *warm*
   (steady-state) run, plus memory and output size.
-- **consistency** — the white, time/phase-maximized match between the ripple (JAX)
-  backend and the LAL baseline, per approximant.
+- **consistency** — the frequency-domain overlap (no time/phase maximization)
+  between the ripple (JAX) backend and the LAL baseline, per approximant.
 
 Import-safe: ``numpy``, ``gwpy``, and ``gwmock_signal`` are imported lazily, so this
 module imports without the ``[signal]`` extra installed.
@@ -329,22 +329,60 @@ def run_performance(  # noqa: PLR0913
     )
 
 
-def _white_match(series_a, series_b, sampling_frequency: float, minimum_frequency: float) -> float:
-    """White, time/phase-maximized match between two real time series."""
+def _overlap_loss(spectrum_a, spectrum_b, in_band) -> float:
+    """Return 1 - overlap of two complex FD series — NO time/phase maximization.
+
+    Uses ``Re(<a,b>)`` (no phase maximization) on a shared frequency grid with a shared
+    coalescence reference (no time maximization), so any residual phase or time
+    discrepancy lowers the overlap rather than being optimized away. Evaluated via the
+    numerically stable identity ``(A·B - C²) / (sqrt(A·B)·(sqrt(A·B) + C))`` so
+    near-unity overlaps keep precision. PSD-weighting is flat (white).
+    """
     import numpy as np
 
-    n = 1 << (int(np.ceil(np.log2(max(len(series_a), len(series_b))))) + 1)
-    spectrum_a = np.fft.rfft(series_a, n=n)
-    spectrum_b = np.fft.rfft(series_b, n=n)
-    in_band = np.fft.rfftfreq(n, d=1.0 / sampling_frequency) >= minimum_frequency
-    spectrum_a = np.where(in_band, spectrum_a, 0.0)
-    spectrum_b = np.where(in_band, spectrum_b, 0.0)
-    cross = spectrum_a * np.conj(spectrum_b)
-    full = np.zeros(n, dtype=complex)
-    full[: len(cross)] = cross
-    correlation = np.fft.ifft(full) * n
-    norm = np.sqrt(np.sum(np.abs(spectrum_a) ** 2) * np.sum(np.abs(spectrum_b) ** 2))
-    return float(np.max(np.abs(correlation)) / norm)
+    a = np.where(in_band, np.asarray(spectrum_a), 0.0)
+    b = np.where(in_band, np.asarray(spectrum_b), 0.0)
+    aa = float(np.sum(np.abs(a) ** 2))
+    bb = float(np.sum(np.abs(b) ** 2))
+    ab = float(np.real(np.sum(a * np.conj(b))))
+    denom = np.sqrt(aa * bb)
+    if denom == 0.0:
+        return 1.0
+    return max((aa * bb - ab**2) / (denom * (denom + ab)), 0.0)
+
+
+def _lal_fd_polarizations(approximant: str, params: dict, *, delta_f, f_min, f_max, f_ref):  # noqa: PLR0913
+    """Return LAL frequency-domain (hp, hc) arrays on the grid 0..f_max (step delta_f)."""
+    import lal
+    import lalsimulation
+    import numpy as np
+
+    lal_params = lal.CreateDict()
+    lalsimulation.SimInspiralWaveformParamsInsertTidalLambda1(lal_params, float(params.get("lambda_1", 0.0)))
+    lalsimulation.SimInspiralWaveformParamsInsertTidalLambda2(lal_params, float(params.get("lambda_2", 0.0)))
+    hp, hc = lalsimulation.SimInspiralChooseFDWaveform(
+        float(params["detector_frame_mass_1"]) * lal.MSUN_SI,
+        float(params["detector_frame_mass_2"]) * lal.MSUN_SI,
+        float(params.get("spin_1x", 0.0)),
+        float(params.get("spin_1y", 0.0)),
+        float(params.get("spin_1z", 0.0)),
+        float(params.get("spin_2x", 0.0)),
+        float(params.get("spin_2y", 0.0)),
+        float(params.get("spin_2z", 0.0)),
+        float(params["luminosity_distance"]) * lal.PC_SI * 1e6,
+        float(params.get("inclination", 0.0)),
+        float(params.get("coa_phase", 0.0)),
+        0.0,
+        0.0,
+        0.0,
+        delta_f,
+        f_min,
+        f_max,
+        f_ref,
+        lal_params,
+        lalsimulation.GetApproximantFromString(approximant),
+    )
+    return np.asarray(hp.data.data), np.asarray(hc.data.data)
 
 
 def run_consistency(  # noqa: PLR0913 - each measurement knob is an explicit keyword
@@ -356,37 +394,39 @@ def run_consistency(  # noqa: PLR0913 - each measurement knob is an explicit key
     n_cpu_cores: int | None = None,
     n_gpus: int | None = None,
 ) -> list[dict]:
-    """Run the ripple-vs-LAL match for every supported approximant.
+    """Measure the ripple-vs-LAL frequency-domain overlap for every supported approximant.
 
-    Returns one record per approximant (``suite='consistency'``, ``label`` is the
-    approximant), so contributed results stay one-data-point-per-file.
+    Overlap is computed in the FREQUENCY DOMAIN with NO time/phase maximization: both
+    backends share the same frequency grid, ``f_ref``, and coalescence reference, so a
+    real-part overlap loss (see :func:`_overlap_loss`) exposes any genuine disagreement.
+    This mirrors ripple's own LAL cross-validation and avoids the FD->TD conditioning
+    differences between the two backends. Returns one record per approximant.
     """
     import numpy as np
-    from gwmock_signal.waveform.backends import LALSimulationBackend, RippleBackend
+    from gwmock_signal.waveform.backends import RippleBackend
 
     ripple_backend = RippleBackend()
-    lal_backend = LALSimulationBackend()
-    tc = 1_126_259_462.4
 
     prov = provenance(package=PACKAGE, libraries=_LIBRARIES, n_cpu_cores=n_cpu_cores, n_gpus=n_gpus)
     records: list[dict] = []
     for approximant, configs in _FAMILIES.items():
         f_min = tidal_minimum_frequency if approximant in _TIDAL else minimum_frequency
-        matches: list[float] = []
+        overlaps: list[float] = []
         for config in configs:
-            common = {
-                "tc": tc,
-                "sampling_frequency": sampling_frequency,
-                "minimum_frequency": f_min,
-                "luminosity_distance": distance,
-                **config,
-            }
-            ripple = ripple_backend.generate_td_waveform(approximant, **common)
-            lal = lal_backend.generate_td_waveform(approximant, **common)
-            for polarization in ("plus", "cross"):
-                matches.append(
-                    _white_match(ripple[polarization].value, lal[polarization].value, sampling_frequency, f_min)
-                )
+            params = {"luminosity_distance": distance, "coa_phase": 0.0, **config}
+            fd = ripple_backend.generate_fd_polarizations(
+                approximant, sampling_frequency=sampling_frequency, minimum_frequency=f_min, **params
+            )
+            freqs = np.asarray(fd.frequencies)
+            delta_f = float(freqs[1] - freqs[0])
+            lal_hp, lal_hc = _lal_fd_polarizations(
+                approximant, params, delta_f=delta_f, f_min=f_min, f_max=float(freqs[-1]), f_ref=f_min
+            )
+            n = min(len(freqs), len(lal_hp))
+            in_band = freqs[:n] >= f_min
+            in_band[-2:] = False  # LAL zeros a variable number of Nyquist bins; drop the last two for both
+            for ripple_pol, lal_pol in ((np.asarray(fd.plus)[:n], lal_hp[:n]), (np.asarray(fd.cross)[:n], lal_hc[:n])):
+                overlaps.append(1.0 - _overlap_loss(ripple_pol, lal_pol, in_band))
         records.append(
             make_record(
                 package=PACKAGE,
@@ -396,9 +436,9 @@ def run_consistency(  # noqa: PLR0913 - each measurement knob is an explicit key
                     "minimum_frequency": f_min,
                     "sampling_frequency": sampling_frequency,
                     "distance": distance,
-                    "n_matches": len(matches),
+                    "n_overlaps": len(overlaps),
                 },
-                metrics={"min_match": min(matches), "median_match": float(np.median(matches))},
+                metrics={"min_overlap": min(overlaps), "median_overlap": float(np.median(overlaps))},
                 provenance=prov,
             )
         )
@@ -468,15 +508,23 @@ def _performance_table(records: list[dict]) -> str:
     return _html_table(headers, rows)
 
 
+def _log_overlap_loss(overlap: float) -> float:
+    """Return log10(1 - overlap); lower (more negative) is closer to identical."""
+    import math
+
+    return math.log10(max(1.0 - overlap, 1e-16))
+
+
 def _consistency_table(records: list[dict]) -> str:
-    """Return an HTML table of ripple-vs-LAL matches per approximant."""
-    headers = ["Approximant", "f_min (Hz)", "worst match", "median match"]
+    """Return an HTML table of ripple-vs-LAL overlap (no maximization) per approximant."""
+    headers = ["Approximant", "f_min (Hz)", "worst overlap", "worst log₁₀ loss", "median log₁₀ loss"]
     rows = [
         [
             record["label"],
             record["configuration"].get("minimum_frequency", ""),
-            f"{_metric(record, 'min_match'):.5f}",
-            f"{_metric(record, 'median_match'):.5f}",
+            f"{_metric(record, 'min_overlap'):.6f}",
+            f"{_log_overlap_loss(_metric(record, 'min_overlap')):.2f}",
+            f"{_log_overlap_loss(_metric(record, 'median_overlap')):.2f}",
         ]
         for record in records
     ]
@@ -509,8 +557,9 @@ def _consistency_chart_rows(records: list[dict]) -> list[dict]:
             "approximant": record["label"],
             "label": record["label"],
             "device": _device(record),
-            "worst": _metric(record, "min_match"),
-            "median": _metric(record, "median_match"),
+            "worst_overlap": _metric(record, "min_overlap"),
+            "worst_log_loss": _log_overlap_loss(_metric(record, "min_overlap")),
+            "median_log_loss": _log_overlap_loss(_metric(record, "median_overlap")),
         }
         for record in records
     ]

@@ -71,4 +71,4 @@ def test_consistency_records():
     for record in records:
         validate_record(record)
         assert record["suite"] == "consistency"
-        assert record["metrics"]["min_match"] > 0.99
+        assert record["metrics"]["min_overlap"] > 0.999
