@@ -17,12 +17,15 @@ from gwmock_benchmark.harness.record import (
     write_record,
 )
 from gwmock_benchmark.harness.submit import render_htcondor, render_slurm, walltime_to_seconds
+from gwmock_benchmark.harness.validate import check_provenance, close
 
 __all__ = [
     "MAX_RECORD_BYTES",
     "SCHEMA_VERSION",
     "ResourceUsage",
     "allocated_cpu_cores",
+    "check_provenance",
+    "close",
     "load_records",
     "make_record",
     "measure",

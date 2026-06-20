@@ -72,3 +72,93 @@ def test_consistency_records():
         validate_record(record)
         assert record["suite"] == "consistency"
         assert record["metrics"]["min_overlap"] > 0.999
+
+
+# --- contribution validation (pure arithmetic; no [signal] extra needed) ---------
+
+
+def _performance_record(**metric_overrides) -> dict:
+    """Build a self-consistent performance record from the harness's own formulas."""
+    import math
+
+    n_events, n_cpu, n_gpu = 5000, 8, 1
+    wall_cold, wall_warm = 27.0, 12.0
+    detectors = ["H1", "L1", "V1"]
+    sf, sd, start = 4096.0, 64.0, 1_126_259_462.0
+    end = start + 8192.0
+    raw = math.ceil((end - start) / sd) * len(detectors) * round(sd * sf) * 8
+    metrics = {
+        "wall_seconds_cold": wall_cold,
+        "wall_seconds_warm": wall_warm,
+        "compile_seconds": max(wall_cold - wall_warm, 0.0),
+        "events_per_second_cold": n_events / wall_cold,
+        "events_per_second_warm": n_events / wall_warm,
+        "cpu_core_hours_cold": wall_cold / 3600.0 * n_cpu,
+        "cpu_core_hours_warm": wall_warm / 3600.0 * n_cpu,
+        "gpu_hours_cold": wall_cold / 3600.0 * n_gpu,
+        "gpu_hours_warm": wall_warm / 3600.0 * n_gpu,
+        "peak_rss_bytes": 6_000_000_000,
+        "average_rss_bytes": 5_000_000_000,
+        "gpu_peak_bytes": 5_000_000_000,
+        "output_bytes": raw,
+    }
+    metrics.update(metric_overrides)
+    return {
+        "schema_version": 1,
+        "package": "gwmock-signal",
+        "suite": "performance",
+        "label": "test",
+        "configuration": {
+            "backend": "ripple",
+            "method": "batched",
+            "approximant": "IMRPhenomD",
+            "detectors": detectors,
+            "n_events": n_events,
+            "sampling_frequency": sf,
+            "minimum_frequency": 20.0,
+            "segment_duration": sd,
+            "start_time": start,
+            "end_time": end,
+        },
+        "metrics": metrics,
+        "provenance": {"n_cpu_cores": n_cpu, "n_gpus": n_gpu},
+    }
+
+
+def test_check_contribution_accepts_consistent_performance():
+    """A record whose metrics follow the defining formulas passes."""
+    assert signal.check_contribution(_performance_record()) == []
+
+
+def test_check_contribution_flags_fabricated_throughput():
+    """Inflating throughput without changing the wall time is caught."""
+    record = _performance_record(events_per_second_warm=5000 / 12.0 * 5)
+    problems = signal.check_contribution(record)
+    assert any("events_per_second_warm" in p for p in problems)
+
+
+def test_check_contribution_flags_inconsistent_compile():
+    """A compile time that is not cold-minus-warm is caught."""
+    problems = signal.check_contribution(_performance_record(compile_seconds=999.0))
+    assert any("compile_seconds" in p for p in problems)
+
+
+def test_check_contribution_flags_impossible_output_size():
+    """An output size below the raw data product is caught."""
+    problems = signal.check_contribution(_performance_record(output_bytes=1))
+    assert any("output_bytes" in p for p in problems)
+
+
+def test_check_contribution_flags_worst_beating_median():
+    """A consistency record whose worst overlap beats its median is caught."""
+    record = {
+        "schema_version": 1,
+        "package": "gwmock-signal",
+        "suite": "consistency",
+        "label": "IMRPhenomD",
+        "configuration": {"n_overlaps": 6, "minimum_frequency": 20.0},
+        "metrics": {"min_overlap": 0.9999999, "median_overlap": 0.999},
+        "provenance": {"n_cpu_cores": 4, "n_gpus": 0},
+    }
+    problems = signal.check_contribution(record)
+    assert any("min_overlap" in p for p in problems)

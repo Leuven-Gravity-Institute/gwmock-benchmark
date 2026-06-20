@@ -18,7 +18,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from gwmock_benchmark.harness import make_record, measure, provenance
+from gwmock_benchmark.harness import close, make_record, measure, provenance
 
 PACKAGE = "gwmock-signal"
 _LIBRARIES = ("ripplegw", "jax", "jaxlib", "lalsuite", "pycbc", "numpy", "gwpy")
@@ -629,3 +629,97 @@ def render(records: list[dict], output_dir: Path) -> list[Path]:
         _write("consistency-table.md", _consistency_table(consistency))
 
     return written
+
+
+# --- contribution validation: derived metrics must agree with the primitives -----
+
+
+def _check_performance(record: dict) -> list[str]:
+    """Return performance-record inconsistencies (empty means OK).
+
+    Recomputes throughput, core-hours, the compile gap, and the data-product size
+    from the configuration + raw wall times, so a hand-edited metric stops agreeing.
+    """
+    import math
+
+    config = record["configuration"]
+    metrics = record["metrics"]
+    prov = record["provenance"]
+    problems: list[str] = []
+
+    n_events = config.get("n_events")
+    if not isinstance(n_events, int) or n_events <= 0:
+        return [f"configuration.n_events must be a positive integer, got {n_events!r}"]
+    n_cpu = prov.get("n_cpu_cores") or 0
+    n_gpu = prov.get("n_gpus") or 0
+
+    for phase in ("cold", "warm"):
+        wall = metrics.get(f"wall_seconds_{phase}")
+        if not isinstance(wall, (int, float)) or wall <= 0:
+            problems.append(f"metrics.wall_seconds_{phase} must be positive, got {wall!r}")
+            continue
+        checks = {
+            f"events_per_second_{phase}": n_events / wall,
+            f"cpu_core_hours_{phase}": wall / 3600.0 * n_cpu,
+            f"gpu_hours_{phase}": wall / 3600.0 * n_gpu,
+        }
+        for key, expected in checks.items():
+            value = metrics.get(key)
+            if value is not None and not close(value, expected):
+                problems.append(f"metrics.{key}={value!r} disagrees with derived {expected:.6g}")
+
+    cold, warm = metrics.get("wall_seconds_cold"), metrics.get("wall_seconds_warm")
+    compile_seconds = metrics.get("compile_seconds")
+    if all(isinstance(v, (int, float)) for v in (cold, warm, compile_seconds)):
+        expected = max(cold - warm, 0.0)
+        if not close(compile_seconds, expected, abs_tol=1e-6):
+            problems.append(
+                f"metrics.compile_seconds={compile_seconds!r} disagrees with max(cold-warm,0)={expected:.6g}"
+            )
+
+    # Output size: the raw data product is n_segments x detectors x samples x 8 bytes.
+    # The on-disk (HDF5) path adds container overhead, so allow [raw, 2x raw].
+    detectors = config.get("detectors") or []
+    span = (config.get("end_time", 0.0) - config.get("start_time", 0.0)) or 0.0
+    segment_duration = config.get("segment_duration") or 0.0
+    sampling_frequency = config.get("sampling_frequency") or 0.0
+    output_bytes = metrics.get("output_bytes")
+    if span > 0 and segment_duration > 0 and sampling_frequency > 0 and detectors and output_bytes is not None:
+        n_segments = math.ceil(span / segment_duration)
+        n_segment_samples = round(segment_duration * sampling_frequency)
+        raw = n_segments * len(detectors) * n_segment_samples * _BYTES_PER_SAMPLE
+        if not (raw * 0.999 <= output_bytes <= raw * 2.0):
+            problems.append(
+                f"metrics.output_bytes={output_bytes!r} outside [{raw}, {2 * raw}] for the configured product"
+            )
+    return problems
+
+
+def _check_consistency(record: dict) -> list[str]:
+    """Return consistency-record inconsistencies (empty means OK)."""
+    metrics = record["metrics"]
+    problems: list[str] = []
+    worst, median = metrics.get("min_overlap"), metrics.get("median_overlap")
+    for name, value in (("min_overlap", worst), ("median_overlap", median)):
+        if not isinstance(value, (int, float)) or not (0.0 < value <= 1.0 + 1e-9):
+            problems.append(f"metrics.{name} must be in (0, 1], got {value!r}")
+    if isinstance(worst, (int, float)) and isinstance(median, (int, float)) and worst > median + 1e-9:
+        problems.append(f"metrics.min_overlap={worst!r} exceeds median_overlap={median!r} (worst cannot beat median)")
+    n_overlaps = record["configuration"].get("n_overlaps")
+    if not isinstance(n_overlaps, int) or n_overlaps < 1:
+        problems.append(f"configuration.n_overlaps must be a positive integer, got {n_overlaps!r}")
+    return problems
+
+
+def check_contribution(record: dict) -> list[str]:
+    """Return a list of internal-consistency problems for a gwmock-signal record.
+
+    Dispatches on ``suite``; an empty list means every derived metric agrees with the
+    primitives it was computed from. Used by ``gwmock-benchmark validate`` in CI.
+    """
+    suite = record.get("suite")
+    if suite == "performance":
+        return _check_performance(record)
+    if suite == "consistency":
+        return _check_consistency(record)
+    return [f"unknown gwmock-signal suite {suite!r}"]
