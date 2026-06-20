@@ -5,12 +5,14 @@ build-backend = "hatchling.build"
 [project]
 name = "gwmock_benchmark"
 authors = [{ name = "Isaac C. F. Wong" }]
-description = "A GitHub template repository for a Python package"
+description = "Shared benchmarking harness, results, and reports for the gwmock packages"
 readme = "README.md"
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: BSD License",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -37,11 +39,11 @@ release = ["git-cliff>=2.13.1"]
 gwmock_benchmark = "gwmock_benchmark.cli.main:app"
 
 [project.urls]
-Documentation = "https://isaac-cf-wong.github.io/gwmock-benchmark"
-Source = "https://github.com/isaac-cf-wong/gwmock-benchmark"
-Tracker = "https://github.com/isaac-cf-wong/gwmock-benchmark/issues"
-Home = "https://github.com/isaac-cf-wong/gwmock-benchmark"
-"Release Notes" = "https://github.com/isaac-cf-wong/gwmock-benchmark/releases"
+Documentation = "https://leuven-gravity-institute.github.io/gwmock-benchmark"
+Source = "https://github.com/Leuven-Gravity-Institute/gwmock-benchmark"
+Tracker = "https://github.com/Leuven-Gravity-Institute/gwmock-benchmark/issues"
+Home = "https://github.com/Leuven-Gravity-Institute/gwmock-benchmark"
+"Release Notes" = "https://github.com/Leuven-Gravity-Institute/gwmock-benchmark/releases"
 
 [tool.hatch.version]
 source = "vcs"
