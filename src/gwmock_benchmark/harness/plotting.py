@@ -21,16 +21,19 @@ def _axes(n_bars: int):
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    figure, axes = plt.subplots(figsize=(max(6.0, 1.6 * n_bars), 4.5))
+    # Keep the figure from getting so wide that the browser scales it down (which
+    # shrinks the text); ~1 in/bar plus a taller aspect keeps the fonts legible.
+    figure, axes = plt.subplots(figsize=(max(7.0, 1.0 * n_bars), 5.0))
     return plt, figure, axes
 
 
 def _finish(plt, figure, axes, labels, ylabel: str, title: str, path: Path) -> Path:  # noqa: PLR0913
     """Apply shared styling, save ``figure`` to ``path`` (SVG), and close it."""
     axes.set_xticks(range(len(labels)))
-    axes.set_xticklabels(labels, rotation=30, ha="right", fontsize=8)
-    axes.set_ylabel(ylabel)
-    axes.set_title(title, fontsize=10)
+    axes.set_xticklabels(labels, rotation=30, ha="right", fontsize=12)
+    axes.set_ylabel(ylabel, fontsize=13)
+    axes.set_title(title, fontsize=14)
+    axes.tick_params(axis="y", labelsize=12)
     axes.grid(axis="y", alpha=0.3)
     figure.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -55,5 +58,5 @@ def grouped_bar(  # noqa: PLR0913 - one keyword per chart dimension
     positions = range(len(labels))
     axes.bar([p - width / 2 for p in positions], cold, width, label="cold (incl. compile)", color=_COLD)
     axes.bar([p + width / 2 for p in positions], warm, width, label="warm (steady state)", color=_WARM)
-    axes.legend(fontsize=8)
+    axes.legend(fontsize=11)
     return _finish(plt, figure, axes, labels, ylabel, title, path)
