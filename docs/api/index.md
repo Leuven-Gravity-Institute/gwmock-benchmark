@@ -15,5 +15,4 @@ This section documents the public API of the python package template.
 
 ## Main Sections
 
-- **[Hello World](hello_world)** – Hello world functions.
 - **[Utility](utils)** – Utility functions.
