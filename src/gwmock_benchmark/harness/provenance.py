@@ -73,6 +73,7 @@ def provenance(
     libraries: tuple[str, ...] = (),
     n_cpu_cores: int | None = None,
     n_gpus: int | None = None,
+    contributor: str | None = None,
 ) -> dict:
     """Return a record of the code versions and hardware behind a benchmark run.
 
@@ -85,6 +86,9 @@ def provenance(
             allocation or the machine core count) — used for CPU core-hours.
         n_gpus: Override the GPU count (defaults to the number ``nvidia-smi`` reports)
             — used for GPU-hours.
+        contributor: Optional GitHub handle of whoever ran and submitted the record,
+            recorded so maintainers can follow up. Voluntary contact metadata, not a
+            verified identity — it is published with the record on the public site.
     """
     requested = ("gwmock-benchmark", *((package,) if package else ()), *libraries)
     library_versions = _library_versions(requested)
@@ -102,4 +106,5 @@ def provenance(
         "gpu_models": gpu_models,
         "n_cpu_cores": n_cpu_cores if n_cpu_cores is not None else allocated_cpu_cores(),
         "n_gpus": n_gpus if n_gpus is not None else len(gpu_models),
+        "contributor": contributor.lstrip("@") if contributor else None,
     }

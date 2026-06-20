@@ -67,3 +67,10 @@ def test_nvidia_smi_absent(monkeypatch):
 
     monkeypatch.setattr(provenance_module.subprocess, "run", _raise)
     assert provenance_module._gpu_models() == []
+
+
+def test_contributor_recorded_and_normalised():
+    """A contributor handle is recorded with any leading '@' stripped; default is None."""
+    assert provenance()["contributor"] is None
+    assert provenance(contributor="@octocat")["contributor"] == "octocat"
+    assert provenance(contributor="octocat")["contributor"] == "octocat"

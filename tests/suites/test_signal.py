@@ -180,3 +180,23 @@ def test_committed_consistency_records_reproduce():
     assert records, f"no committed consistency records under {data_dir}"
     problems = signal.reproduce_consistency(records)
     assert not problems, "\n".join(problems)
+
+
+def test_performance_table_renders_linked_contributor():
+    """A recorded contributor handle renders as a GitHub profile link; absent is blank."""
+    record = _performance_record()
+    record["provenance"]["contributor"] = "octocat"
+    table = signal._performance_table([record])
+    assert "<th>contributor</th>" in table
+    assert '<a href="https://github.com/octocat"' in table
+    assert "@octocat" in table
+
+    record["provenance"]["contributor"] = None
+    assert signal._contributor_cell(record) == ""
+
+
+def test_contributor_cell_escapes_handle():
+    """The handle is HTML-escaped even though valid handles never need it (defence in depth)."""
+    record = _performance_record()
+    record["provenance"]["contributor"] = "a<b>"
+    assert "<b>" not in signal._contributor_cell(record)
