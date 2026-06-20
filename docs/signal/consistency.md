@@ -22,7 +22,7 @@ the gwmock-signal test suite.
 The match is a numerical property of the waveforms, independent of the hardware
 that computed it.
 
-![ripple vs LAL match](figures/consistency_matches.svg)
+--8<-- "docs/signal/generated/consistency-charts.md"
 
 --8<-- "docs/signal/generated/consistency-table.md"
 

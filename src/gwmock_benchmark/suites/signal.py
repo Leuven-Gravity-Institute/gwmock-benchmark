@@ -18,7 +18,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from gwmock_benchmark.harness import grouped_bar, make_record, measure, provenance, single_bar
+from gwmock_benchmark.harness import make_record, measure, provenance
 
 PACKAGE = "gwmock-signal"
 _LIBRARIES = ("ripplegw", "jax", "jaxlib", "lalsuite", "pycbc", "numpy", "gwpy")
@@ -420,10 +420,15 @@ def _metric(record: dict, key: str) -> float:
     return float(record["metrics"].get(key) or 0.0)
 
 
-def _version_subtitle(records: list[dict]) -> str:
-    """Return a 'gwmock-signal <versions>' subtitle for the figures."""
-    versions = sorted({r["provenance"].get("package_version") or "?" for r in records})
-    return f"{PACKAGE} {', '.join(versions)}"
+def _short_device(name: str) -> str:
+    """Shorten a CPU/GPU model for compact chart x-axis labels."""
+    import re
+
+    name = name.replace("(R)", "").replace("(TM)", "")
+    name = re.sub(r"\s*\d+-Core Processor", "", name)
+    name = re.sub(r"\s*CPU @.*", "", name)
+    name = re.sub(r"\bProcessor\b", "", name)
+    return re.sub(r"\s+", " ", name).strip()
 
 
 def _html_table(headers: list[str], rows: list[list]) -> str:
@@ -478,13 +483,57 @@ def _consistency_table(records: list[dict]) -> str:
     return _html_table(headers, rows)
 
 
-def render(records: list[dict], output_dir: Path) -> list[Path]:
-    """Render figures + table snippets for the gwmock-signal records under ``output_dir``.
+def _performance_chart_rows(records: list[dict]) -> list[dict]:
+    """Return chart-ready rows for the performance records (one per cell)."""
+    return [
+        {
+            "name": f"{record['label']} · {_short_device(_device(record))}",
+            "label": record["label"],
+            "device": _device(record),
+            "throughput_cold": _metric(record, "events_per_second_cold"),
+            "throughput_warm": _metric(record, "events_per_second_warm"),
+            "wall_cold": _metric(record, "wall_seconds_cold"),
+            "wall_warm": _metric(record, "wall_seconds_warm"),
+            "compile": _metric(record, "compile_seconds"),
+            "peak_gb": _metric(record, "peak_rss_bytes") / 1e9,
+            "output_gb": _metric(record, "output_bytes") / 1e9,
+        }
+        for record in records
+    ]
 
-    Writes SVG figures to ``output_dir/figures`` and Markdown table snippets to
-    ``output_dir/generated``. Returns the paths written.
+
+def _consistency_chart_rows(records: list[dict]) -> list[dict]:
+    """Return chart-ready rows for the consistency records (one per approximant)."""
+    return [
+        {
+            "approximant": record["label"],
+            "label": record["label"],
+            "device": _device(record),
+            "worst": _metric(record, "min_match"),
+            "median": _metric(record, "median_match"),
+        }
+        for record in records
+    ]
+
+
+def _charts_snippet(group: str, suite: str, rows: list[dict]) -> str:
+    """Return an HTML snippet: inline JSON data + a container the chart JS renders into."""
+    import json
+
+    payload = json.dumps(rows, separators=(",", ":"))
+    return (
+        f'<script type="application/json" class="benchmark-chart-data" data-group="{group}">{payload}</script>\n'
+        f'<div class="benchmark-charts" data-group="{group}" data-suite="{suite}"></div>\n'
+    )
+
+
+def render(records: list[dict], output_dir: Path) -> list[Path]:
+    """Render chart + table snippets for the gwmock-signal records under ``output_dir``.
+
+    Writes Markdown snippets to ``output_dir/generated``: per suite, an interactive
+    table and an inline-data block that the client-side Vega-Lite charts render from.
+    Returns the paths written.
     """
-    figures = output_dir / "figures"
     generated = output_dir / "generated"
     generated.mkdir(parents=True, exist_ok=True)
     written: list[Path] = []
@@ -492,64 +541,23 @@ def render(records: list[dict], output_dir: Path) -> list[Path]:
     performance = sorted((r for r in records if r["suite"] == "performance"), key=lambda r: r["label"])
     consistency = sorted((r for r in records if r["suite"] == "consistency"), key=lambda r: r["label"])
 
+    def _write(name: str, content: str) -> None:
+        path = generated / name
+        path.write_text(content)
+        written.append(path)
+
     if performance:
-        subtitle = _version_subtitle(performance)
-        labels = [f"{r['label']}\n{_device(r)}" for r in performance]
-        paired = [
-            ("events_per_second", "Throughput [events/s]", "performance_throughput.svg"),
-            ("wall_seconds", "Wall time [s]", "performance_walltime.svg"),
-            ("cpu_core_hours", "CPU core-hours", "performance_cpu_core_hours.svg"),
-            ("gpu_hours", "GPU-hours", "performance_gpu_hours.svg"),
-        ]
-        for stem, ylabel, filename in paired:
-            cold = [_metric(r, f"{stem}_cold") for r in performance]
-            warm = [_metric(r, f"{stem}_warm") for r in performance]
-            if not any(cold) and not any(warm):
-                continue  # e.g. no GPU runs -> skip GPU-hours
-            written.append(
-                grouped_bar(
-                    figures / filename,
-                    labels=labels,
-                    cold=cold,
-                    warm=warm,
-                    ylabel=ylabel,
-                    title=f"{ylabel} - cold vs warm\n{subtitle}",
-                )
-            )
-        singles = [
-            ([_metric(r, "compile_seconds") for r in performance], "One-time compile [s]", "performance_compile.svg"),
-            (
-                [_metric(r, "peak_rss_bytes") / 1e9 for r in performance],
-                "Peak memory [GB]",
-                "performance_peak_memory.svg",
-            ),
-            ([_metric(r, "output_bytes") / 1e9 for r in performance], "Output data [GB]", "performance_output.svg"),
-        ]
-        for values, ylabel, filename in singles:
-            if not any(values):
-                continue
-            written.append(
-                single_bar(
-                    figures / filename, labels=labels, values=values, ylabel=ylabel, title=f"{ylabel}\n{subtitle}"
-                )
-            )
-        table = generated / "performance-table.md"
-        table.write_text(_performance_table(performance))
-        written.append(table)
+        _write(
+            "performance-charts.md",
+            _charts_snippet("signal-performance", "performance", _performance_chart_rows(performance)),
+        )
+        _write("performance-table.md", _performance_table(performance))
 
     if consistency:
-        subtitle = _version_subtitle(consistency)
-        written.append(
-            single_bar(
-                figures / "consistency_matches.svg",
-                labels=[r["label"] for r in consistency],
-                values=[_metric(r, "min_match") for r in consistency],
-                ylabel="worst-case match",
-                title=f"ripple vs LAL - worst-case match\n{subtitle}",
-            )
+        _write(
+            "consistency-charts.md",
+            _charts_snippet("signal-consistency", "consistency", _consistency_chart_rows(consistency)),
         )
-        table = generated / "consistency-table.md"
-        table.write_text(_consistency_table(consistency))
-        written.append(table)
+        _write("consistency-table.md", _consistency_table(consistency))
 
     return written

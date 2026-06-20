@@ -21,23 +21,13 @@ actually sees. The cold bars are kept beside it because a GPU's compile is
 larger than a CPU's, which can mask the device's advantage at small event
 counts.
 
+The charts are interactive — hover for exact values, click the legend to isolate
+cold or warm, and use the chart menu to export. The table below is sortable and
+searchable.
+
+--8<-- "docs/signal/generated/performance-charts.md"
+
 --8<-- "docs/signal/generated/performance-table.md"
-
-![Throughput, cold vs warm](figures/performance_throughput.svg)
-
-![Wall time, cold vs warm](figures/performance_walltime.svg)
-
-![One-time compile](figures/performance_compile.svg)
-
-??? note "More metrics (core-hours, memory, output size)"
-
-    ![CPU core-hours](figures/performance_cpu_core_hours.svg)
-
-    ![GPU-hours](figures/performance_gpu_hours.svg)
-
-    ![Peak memory](figures/performance_peak_memory.svg)
-
-    ![Output data](figures/performance_output.svg)
 
 !!! note "Reproduce / contribute"
 

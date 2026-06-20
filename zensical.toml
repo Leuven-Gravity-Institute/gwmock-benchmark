@@ -73,7 +73,10 @@ nav = [
 #
 # Read more: https://zensical.org/docs/customization/#additional-css
 #
-extra_css = ["stylesheets/benchmark-table.css"]
+extra_css = [
+  "stylesheets/benchmark-table.css",
+  "stylesheets/benchmark-charts.css",
+]
 
 # With the `extra_javascript` option you can add your own JavaScript to your
 # project to customize the behavior according to your needs.
@@ -81,7 +84,13 @@ extra_css = ["stylesheets/benchmark-table.css"]
 # The path provided should be relative to the "docs_dir".
 #
 # Read more: https://zensical.org/docs/customization/#additional-javascript
-extra_javascript = ["javascripts/benchmark-table.js"]
+extra_javascript = [
+  "javascripts/benchmark-table.js",
+  "javascripts/vendor/vega.min.js",
+  "javascripts/vendor/vega-lite.min.js",
+  "javascripts/vendor/vega-embed.min.js",
+  "javascripts/benchmark-charts.js",
+]
 
 # ----------------------------------------------------------------------------
 # Section for configuring theme options
