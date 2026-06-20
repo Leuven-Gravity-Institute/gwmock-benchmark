@@ -28,6 +28,14 @@ The `gwmock-signal` version is shown in the tooltip and the table.
 numerical property of the waveforms, independent of the hardware that computed
 it.
 
+!!! success "Reproduced in CI"
+
+    Because the overlap is deterministic and hardware-independent, CI **re-runs
+    this suite against the same toolchain and asserts every committed record
+    reproduces** (`gwmock-benchmark signal verify-consistency`). These numbers are
+    therefore not trust-based — a fabricated overlap cannot survive an independent
+    recomputation.
+
 --8<-- "docs/signal/generated/consistency-charts.md"
 
 --8<-- "docs/signal/generated/consistency-table.md"

@@ -723,3 +723,64 @@ def check_contribution(record: dict) -> list[str]:
     if suite == "consistency":
         return _check_consistency(record)
     return [f"unknown gwmock-signal suite {suite!r}"]
+
+
+def reproduce_consistency(records: list[dict], *, tolerance: float = 0.5) -> list[str]:
+    """Re-run the consistency suite and return committed records that fail to reproduce.
+
+    The ripple-vs-LAL overlap is deterministic and hardware-independent, so re-running
+    it against the same (locked) toolchain reproduces a genuine record to machine
+    precision. This takes consistency out of the trust model: a fabricated overlap
+    cannot survive an independent recomputation. Compared on ``log10(1 - overlap)``
+    with an absolute ``tolerance`` that absorbs cross-platform float noise (measured
+    reproduction error is ~0) while still catching the orders-of-magnitude gap a
+    fabricated value would show. Requires the ``[signal]`` extra. Empty means OK.
+    """
+    import math
+
+    consistency = [record for record in records if record.get("suite") == "consistency"]
+    if not consistency:
+        return []
+
+    sampling = {r["configuration"].get("sampling_frequency") for r in consistency}
+    distance = {r["configuration"].get("distance") for r in consistency}
+    if len(sampling) != 1 or len(distance) != 1:
+        return [f"consistency records mix sampling_frequency/distance ({sampling}, {distance}); verify separately"]
+    minimum_frequency = next(
+        (r["configuration"]["minimum_frequency"] for r in consistency if r["label"] not in _TIDAL), 20.0
+    )
+    tidal_minimum_frequency = next(
+        (r["configuration"]["minimum_frequency"] for r in consistency if r["label"] in _TIDAL), 40.0
+    )
+
+    fresh = {
+        record["label"]: record
+        for record in run_consistency(
+            sampling_frequency=sampling.pop(),
+            minimum_frequency=minimum_frequency,
+            tidal_minimum_frequency=tidal_minimum_frequency,
+            distance=distance.pop(),
+        )
+    }
+
+    def log_loss(overlap: float) -> float:
+        return math.log10(max(1.0 - overlap, 1e-16))
+
+    problems: list[str] = []
+    for record in consistency:
+        label = record["label"]
+        if label not in fresh:
+            problems.append(f"{label}: not produced by the re-run (unknown approximant?)")
+            continue
+        for key in ("min_overlap", "median_overlap"):
+            stored, recomputed = record["metrics"].get(key), fresh[label]["metrics"].get(key)
+            if stored is None or recomputed is None:
+                problems.append(f"{label}: missing {key}")
+                continue
+            delta = abs(log_loss(stored) - log_loss(recomputed))
+            if delta > tolerance:
+                problems.append(
+                    f"{label}: {key} stored loss {log_loss(stored):.3f} but reproduced "
+                    f"{log_loss(recomputed):.3f} (Δ={delta:.3f} > {tolerance})"
+                )
+    return problems

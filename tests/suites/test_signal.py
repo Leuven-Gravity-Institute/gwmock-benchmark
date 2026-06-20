@@ -162,3 +162,21 @@ def test_check_contribution_flags_worst_beating_median():
     }
     problems = signal.check_contribution(record)
     assert any("min_overlap" in p for p in problems)
+
+
+@pytest.mark.integration
+def test_committed_consistency_records_reproduce():
+    """Re-running the deterministic suite reproduces every committed consistency record.
+
+    This takes consistency out of the trust model: a fabricated overlap cannot survive
+    an independent recomputation against the same toolchain.
+    """
+    from pathlib import Path
+
+    from gwmock_benchmark.harness import load_records
+
+    data_dir = Path(__file__).resolve().parents[2] / "data" / "signal" / "consistency"
+    records = load_records(data_dir)
+    assert records, f"no committed consistency records under {data_dir}"
+    problems = signal.reproduce_consistency(records)
+    assert not problems, "\n".join(problems)
