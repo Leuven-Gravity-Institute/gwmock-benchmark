@@ -41,7 +41,7 @@ build = ["hatch>=1.17.0"]
 release = ["git-cliff>=2.13.1"]
 
 [project.scripts]
-gwmock_benchmark = "gwmock_benchmark.cli.main:app"
+gwmock-benchmark = "gwmock_benchmark.cli.main:app"
 
 [project.urls]
 Documentation = "https://leuven-gravity-institute.github.io/gwmock-benchmark"

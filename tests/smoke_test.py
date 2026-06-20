@@ -21,7 +21,7 @@ def test_basic_import() -> None:
 def test_cli_help() -> None:
     """Test CLI help."""
     # Ensure the 'my-tool' command was registered and runs
-    result = subprocess.run(["gwmock_benchmark", "--help"], capture_output=True, text=True, check=False)  # noqa: S607
+    result = subprocess.run(["gwmock-benchmark", "--help"], capture_output=True, text=True, check=False)  # noqa: S607
     assert result.returncode == 0
     assert "usage:" in result.stdout.lower()
 
