@@ -1,0 +1,24 @@
+/* Layout for the interactive Vega-Lite benchmark charts (see benchmark-charts.js). */
+
+.benchmark-charts {
+    margin: 1rem 0;
+}
+
+.benchmark-chart {
+    width: 100%;
+    max-width: 820px;
+    margin: 1.5rem auto;
+}
+
+/* vega-embed sizes to its container; make sure it can. */
+.benchmark-chart .vega-embed {
+    width: 100%;
+}
+
+.benchmark-chart .vega-embed summary {
+    opacity: 0.5;
+}
+
+.benchmark-chart .vega-embed:hover summary {
+    opacity: 1;
+}

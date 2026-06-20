@@ -1,3 +1,6 @@
+# Vendored third-party libraries (minified) — never lint or reformat them.
+exclude: '^docs/javascripts/vendor/'
+
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
       rev: v6.0.0
