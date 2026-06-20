@@ -1,6 +1,6 @@
 # Support
 
-Thank you for your interest in **python-package-template**!
+Thank you for your interest in **gwmock-benchmark**!
 
 If you have questions, suggestions, or need help using the project, here are
 some ways to get support:
@@ -8,10 +8,10 @@ some ways to get support:
 ## 💬 Ask a Question
 
 If you're experiencing a problem or have a question about how to use
-`python-package-template`, please open a
-[GitHub Discussion](https://github.com/isaac-cf-wong/python-package-template/discussions)
-or [Issue](https://github.com/isaac-cf-wong/python-package-template/issues),
-depending on the nature of your question.
+`gwmock-benchmark`, please open a
+[GitHub Discussion](https://github.com/isaac-cf-wong/gwmock-benchmark/discussions)
+or [Issue](https://github.com/isaac-cf-wong/gwmock-benchmark/issues), depending
+on the nature of your question.
 
 - Use **Discussions** for general questions, ideas, or usage help.
 - Use **Issues** for reporting bugs or requesting new features.
@@ -19,13 +19,13 @@ depending on the nature of your question.
 ## 🐛 Found a Bug
 
 Please check if your issue has already been reported. If not, create a
-[new issue](https://github.com/isaac-cf-wong/python-package-template/issues/new/choose)
+[new issue](https://github.com/isaac-cf-wong/gwmock-benchmark/issues/new/choose)
 with:
 
 - A clear and descriptive title.
 - Steps to reproduce the problem.
 - Relevant logs or error messages.
-- The version of Python and `python-package-template` you're using.
+- The version of Python and `gwmock-benchmark` you're using.
 
 ## 🙋 Want to Contribute
 

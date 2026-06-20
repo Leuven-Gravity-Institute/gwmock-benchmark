@@ -16,9 +16,9 @@ def hello_command(name: Annotated[str, typer.Option("--name", help="Name.")]) ->
     """
     from logging import getLogger
 
-    from python_package_template.hello_world import say_hello
+    from gwmock_benchmark.hello_world import say_hello
 
-    logger = getLogger("python_package_template")
+    logger = getLogger("gwmock_benchmark")
 
     say_hello(name)
 

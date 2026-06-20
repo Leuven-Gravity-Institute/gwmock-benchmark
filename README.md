@@ -1,9 +1,9 @@
 # Python Project Template
 
-[![Python CI](https://github.com/isaac-cf-wong/python-package-template/actions/workflows/ci.yml/badge.svg)](https://github.com/isaac-cf-wong/python-package-template/actions/workflows/ci.yml)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/isaac-cf-wong/python-package-template/main.svg)](https://results.pre-commit.ci/latest/github/isaac-cf-wong/python-package-template/main)
-[![Documentation Status](https://github.com/isaac-cf-wong/python-package-template/actions/workflows/documentation.yml/badge.svg)](https://isaac-cf-wong.github.io/python-package-template/)
-[![codecov](https://codecov.io/gh/isaac-cf-wong/python-package-template/graph/badge.svg?token=COF8341N60)](https://codecov.io/gh/isaac-cf-wong/python-package-template)
+[![Python CI](https://github.com/isaac-cf-wong/gwmock-benchmark/actions/workflows/ci.yml/badge.svg)](https://github.com/isaac-cf-wong/gwmock-benchmark/actions/workflows/ci.yml)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/isaac-cf-wong/gwmock-benchmark/main.svg)](https://results.pre-commit.ci/latest/github/isaac-cf-wong/gwmock-benchmark/main)
+[![Documentation Status](https://github.com/isaac-cf-wong/gwmock-benchmark/actions/workflows/documentation.yml/badge.svg)](https://isaac-cf-wong.github.io/gwmock-benchmark/)
+[![codecov](https://codecov.io/gh/isaac-cf-wong/gwmock-benchmark/graph/badge.svg?token=COF8341N60)](https://codecov.io/gh/isaac-cf-wong/gwmock-benchmark)
 [![PyPI Version](https://img.shields.io/pypi/v/package-name-placeholder)](https://pypi.org/project/package-name-placeholder/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/package-name-placeholder)](https://pypi.org/project/package-name-placeholder/)
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](LICENSE)

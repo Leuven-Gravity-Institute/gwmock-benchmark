@@ -335,6 +335,52 @@ wheels = [
 ]
 
 [[package]]
+name = "gwmock-benchmark"
+source = { editable = "." }
+dependencies = [
+    { name = "typer" },
+]
+
+[package.dev-dependencies]
+build = [
+    { name = "hatch" },
+]
+dev = [
+    { name = "prek" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "pytest-github-actions-annotate-failures" },
+    { name = "pytest-mock" },
+    { name = "ruff" },
+]
+docs = [
+    { name = "mkdocstrings-python" },
+    { name = "zensical" },
+]
+release = [
+    { name = "git-cliff" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "typer", specifier = ">=0.26.7" }]
+
+[package.metadata.requires-dev]
+build = [{ name = "hatch", specifier = ">=1.17.0" }]
+dev = [
+    { name = "prek", specifier = ">=0.4.5" },
+    { name = "pytest", specifier = ">=9.1.0" },
+    { name = "pytest-cov", specifier = ">=7.1.0" },
+    { name = "pytest-github-actions-annotate-failures", specifier = ">=0.4.0" },
+    { name = "pytest-mock", specifier = ">=3.15.1" },
+    { name = "ruff", specifier = ">=0.15.17" },
+]
+docs = [
+    { name = "mkdocstrings-python", specifier = ">=2.0.4" },
+    { name = "zensical", specifier = ">=0.0.45" },
+]
+release = [{ name = "git-cliff", specifier = ">=2.13.1" }]
+
+[[package]]
 name = "h11"
 version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
@@ -911,52 +957,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/0b/1a/cbbaf13b730abb0a1
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1a/82/a70006589557f267f15bd384c0642ad49f0d97b690c3a05b166b9dcbad3b/python_discovery-1.4.2-py3-none-any.whl", hash = "sha256:475803f53b7b2ed6e490e27373f9d8340f7d2eebf9acdaf645d7d714c97bb500", size = 33886, upload-time = "2026-06-11T16:10:41.192Z" },
 ]
-
-[[package]]
-name = "python-package-template"
-source = { editable = "." }
-dependencies = [
-    { name = "typer" },
-]
-
-[package.dev-dependencies]
-build = [
-    { name = "hatch" },
-]
-dev = [
-    { name = "prek" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "pytest-github-actions-annotate-failures" },
-    { name = "pytest-mock" },
-    { name = "ruff" },
-]
-docs = [
-    { name = "mkdocstrings-python" },
-    { name = "zensical" },
-]
-release = [
-    { name = "git-cliff" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "typer", specifier = ">=0.26.7" }]
-
-[package.metadata.requires-dev]
-build = [{ name = "hatch", specifier = ">=1.17.0" }]
-dev = [
-    { name = "prek", specifier = ">=0.4.5" },
-    { name = "pytest", specifier = ">=9.1.0" },
-    { name = "pytest-cov", specifier = ">=7.1.0" },
-    { name = "pytest-github-actions-annotate-failures", specifier = ">=0.4.0" },
-    { name = "pytest-mock", specifier = ">=3.15.1" },
-    { name = "ruff", specifier = ">=0.15.17" },
-]
-docs = [
-    { name = "mkdocstrings-python", specifier = ">=2.0.4" },
-    { name = "zensical", specifier = ">=0.0.45" },
-]
-release = [{ name = "git-cliff", specifier = ">=2.13.1" }]
 
 [[package]]
 name = "pywin32-ctypes"

@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "python_package_template"
+name = "gwmock_benchmark"
 authors = [{ name = "Isaac C. F. Wong" }]
 description = "A GitHub template repository for a Python package"
 readme = "README.md"
@@ -34,20 +34,20 @@ build = ["hatch>=1.17.0"]
 release = ["git-cliff>=2.13.1"]
 
 [project.scripts]
-python_package_template = "python_package_template.cli.main:app"
+gwmock_benchmark = "gwmock_benchmark.cli.main:app"
 
 [project.urls]
-Documentation = "https://isaac-cf-wong.github.io/python-package-template"
-Source = "https://github.com/isaac-cf-wong/python-package-template"
-Tracker = "https://github.com/isaac-cf-wong/python-package-template/issues"
-Home = "https://github.com/isaac-cf-wong/python-package-template"
-"Release Notes" = "https://github.com/isaac-cf-wong/python-package-template/releases"
+Documentation = "https://isaac-cf-wong.github.io/gwmock-benchmark"
+Source = "https://github.com/isaac-cf-wong/gwmock-benchmark"
+Tracker = "https://github.com/isaac-cf-wong/gwmock-benchmark/issues"
+Home = "https://github.com/isaac-cf-wong/gwmock-benchmark"
+"Release Notes" = "https://github.com/isaac-cf-wong/gwmock-benchmark/releases"
 
 [tool.hatch.version]
 source = "vcs"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/python_package_template"]
+packages = ["src/gwmock_benchmark"]
 
 [tool.coverage.run]
 branch = true

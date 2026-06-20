@@ -1,7 +1,7 @@
-# Contributing to python-package-template
+# Contributing to gwmock-benchmark
 
-🎉 Thank you for your interest in contributing to `python-package-template`!
-Your ideas, fixes, and improvements are welcome and appreciated.
+🎉 Thank you for your interest in contributing to `gwmock-benchmark`! Your
+ideas, fixes, and improvements are welcome and appreciated.
 
 Whether you’re fixing a typo, reporting a bug, suggesting a feature, or
 submitting a pull request—this guide will help you get started.
@@ -13,20 +13,20 @@ submitting a pull request—this guide will help you get started.
 1. Open an Issue
 
     - Have a question, bug report, or feature suggestion?
-    [Open an issue](https://github.com/isaac-cf-wong/python-package-template/issues/new/choose)
+    [Open an issue](https://github.com/isaac-cf-wong/gwmock-benchmark/issues/new/choose)
     and describe your idea clearly.
     - Check for existing issues before opening a new one.
 
 2. Fork and Clone the Repository
 
     ```shell
-    git clone git@github.com:<username>/python-package-template.git
-    cd python-package-template
+    git clone git@github.com:<username>/gwmock-benchmark.git
+    cd gwmock-benchmark
     ```
 
 3. Set Up Your Environment
 
-    We recommend using uv to manage virtual environments for installing `python-package-template`.
+    We recommend using uv to manage virtual environments for installing `gwmock-benchmark`.
     If you don't have uv installed, you can install it with pip. See the project pages for more details:
 
     - Install via pip: `pip install --upgrade pip && pip install uv`
@@ -167,6 +167,6 @@ project’s 3-Clause BSD License.
 
 ---
 
-Thanks again for being part of the `python-package-template` community!
+Thanks again for being part of the `gwmock-benchmark` community!
 
 ---
