@@ -23,11 +23,16 @@ def _peak_rss_bytes() -> int:
 
 
 def _current_rss_bytes() -> int:
-    """Return the current resident set size in bytes (Linux ``/proc/self/statm``)."""
+    """Return the current resident set size in bytes.
+
+    Uses Linux ``/proc/self/statm`` for a true instantaneous reading. Where that is
+    unavailable (e.g. macOS), it falls back to peak RSS, so the average-memory
+    sampling degrades to peak-tracking rather than reporting a misleading zero.
+    """
     try:
         resident_pages = int(Path("/proc/self/statm").read_text().split()[1])
     except (OSError, IndexError, ValueError):
-        return 0
+        return _peak_rss_bytes()
     return resident_pages * resource.getpagesize()
 
 
