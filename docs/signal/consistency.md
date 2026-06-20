@@ -33,4 +33,4 @@ that computed it.
     ```
 
     Then open a pull request adding the data files. See
-    [Contributing](../contributing.md).
+    [Contribute a benchmark](../contribute.md).
