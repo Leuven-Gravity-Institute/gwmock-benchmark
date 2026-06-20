@@ -48,5 +48,7 @@ def test_zero_gpus_is_allowed():
 
 def test_close_tolerates_rounding_but_not_disagreement():
     """``close`` accepts float-rounding noise and rejects genuine mismatch."""
-    assert close(419.6286387363326, 5000 / 11.915297333034687)
-    assert not close(2098.0, 419.6)
+    is_close = close(419.6286387363326, 5000 / 11.915297333034687)
+    is_mismatch_close = close(2098.0, 419.6)
+    assert is_close
+    assert not is_mismatch_close
