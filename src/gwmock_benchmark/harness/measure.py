@@ -7,7 +7,6 @@ imported lazily so this module stays importable without the optional GPU stack.
 from __future__ import annotations
 
 import platform
-import resource
 import threading
 import time
 from collections.abc import Iterator
@@ -15,9 +14,16 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 
+try:
+    import resource
+except ImportError:  # Windows has no `resource`; benchmarks run on Unix HPC nodes
+    resource = None
+
 
 def _peak_rss_bytes() -> int:
-    """Return peak resident set size in bytes (ru_maxrss is KiB on Linux, bytes on macOS)."""
+    """Return peak resident set size in bytes (0 where ``resource`` is unavailable)."""
+    if resource is None:
+        return 0
     maxrss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     return maxrss * 1024 if platform.system() == "Linux" else maxrss
 
@@ -26,9 +32,12 @@ def _current_rss_bytes() -> int:
     """Return the current resident set size in bytes.
 
     Uses Linux ``/proc/self/statm`` for a true instantaneous reading. Where that is
-    unavailable (e.g. macOS), it falls back to peak RSS, so the average-memory
-    sampling degrades to peak-tracking rather than reporting a misleading zero.
+    unavailable (e.g. macOS, or Windows without ``resource``), it falls back to peak
+    RSS, so the average-memory sampling degrades to peak-tracking rather than
+    reporting a misleading zero.
     """
+    if resource is None:
+        return _peak_rss_bytes()
     try:
         resident_pages = int(Path("/proc/self/statm").read_text().split()[1])
     except (OSError, IndexError, ValueError):
