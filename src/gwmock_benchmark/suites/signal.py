@@ -426,32 +426,56 @@ def _version_subtitle(records: list[dict]) -> str:
     return f"{PACKAGE} {', '.join(versions)}"
 
 
+def _html_table(headers: list[str], rows: list[list]) -> str:
+    """Return an HTML table (class ``benchmark-table``) enhanced client-side to sort/filter."""
+    import html
+
+    head = "".join(f"<th>{html.escape(str(h))}</th>" for h in headers)
+    body = "\n".join("<tr>" + "".join(f"<td>{html.escape(str(cell))}</td>" for cell in row) + "</tr>" for row in rows)
+    return f'<table class="benchmark-table">\n<thead><tr>{head}</tr></thead>\n<tbody>\n{body}\n</tbody>\n</table>\n'
+
+
 def _performance_table(records: list[dict]) -> str:
-    """Return a Markdown table of the performance records (warm is the headline)."""
-    header = (
-        "| cell | device | warm ev/s | cold/warm wall (s) | compile (s) | peak mem (GB) | output (GB) |\n"
-        "| --- | --- | ---: | ---: | ---: | ---: | ---: |\n"
-    )
-    rows = []
-    for record in records:
-        rows.append(
-            f"| {record['label']} | {_device(record)} | {_metric(record, 'events_per_second_warm'):.0f} | "
-            f"{_metric(record, 'wall_seconds_cold'):.0f} / {_metric(record, 'wall_seconds_warm'):.0f} | "
-            f"{_metric(record, 'compile_seconds'):.1f} | {_metric(record, 'peak_rss_bytes') / 1e9:.1f} | "
-            f"{_metric(record, 'output_bytes') / 1e9:.2f} |"
-        )
-    return header + "\n".join(rows) + "\n"
+    """Return an HTML table of the performance records (warm is the headline)."""
+    headers = [
+        "cell",
+        "device",
+        "warm ev/s",
+        "cold wall (s)",
+        "warm wall (s)",
+        "compile (s)",
+        "peak mem (GB)",
+        "output (GB)",
+    ]
+    rows = [
+        [
+            record["label"],
+            _device(record),
+            f"{_metric(record, 'events_per_second_warm'):.0f}",
+            f"{_metric(record, 'wall_seconds_cold'):.0f}",
+            f"{_metric(record, 'wall_seconds_warm'):.0f}",
+            f"{_metric(record, 'compile_seconds'):.1f}",
+            f"{_metric(record, 'peak_rss_bytes') / 1e9:.1f}",
+            f"{_metric(record, 'output_bytes') / 1e9:.2f}",
+        ]
+        for record in records
+    ]
+    return _html_table(headers, rows)
 
 
 def _consistency_table(records: list[dict]) -> str:
-    """Return a Markdown table of ripple-vs-LAL matches per approximant."""
-    header = "| Approximant | f_min (Hz) | worst match | median match |\n| --- | ---: | ---: | ---: |\n"
+    """Return an HTML table of ripple-vs-LAL matches per approximant."""
+    headers = ["Approximant", "f_min (Hz)", "worst match", "median match"]
     rows = [
-        f"| `{r['label']}` | {r['configuration'].get('minimum_frequency', '')!s} | "
-        f"{_metric(r, 'min_match'):.5f} | {_metric(r, 'median_match'):.5f} |"
-        for r in records
+        [
+            record["label"],
+            record["configuration"].get("minimum_frequency", ""),
+            f"{_metric(record, 'min_match'):.5f}",
+            f"{_metric(record, 'median_match'):.5f}",
+        ]
+        for record in records
     ]
-    return header + "\n".join(rows) + "\n"
+    return _html_table(headers, rows)
 
 
 def render(records: list[dict], output_dir: Path) -> list[Path]:

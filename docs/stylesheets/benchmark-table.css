@@ -1,0 +1,64 @@
+/* Styling for the interactive benchmark tables (see benchmark-table.js). */
+
+.benchmark-table-wrap {
+    margin: 1rem 0;
+}
+
+.benchmark-table-search {
+    width: 100%;
+    max-width: 24rem;
+    margin-bottom: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+    color: var(--md-default-fg-color, #000);
+    background: var(--md-default-bg-color, #fff);
+    border: 0.05rem solid var(--md-default-fg-color--lighter, #ccc);
+    border-radius: 0.2rem;
+}
+
+.benchmark-table-scroll {
+    overflow-x: auto;
+}
+
+table.benchmark-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.72rem;
+}
+
+table.benchmark-table th,
+table.benchmark-table td {
+    padding: 0.35rem 0.7rem;
+    text-align: left;
+    white-space: nowrap;
+    border: 0.05rem solid var(--md-default-fg-color--lightest, #eee);
+}
+
+table.benchmark-table thead th {
+    background: var(--md-default-fg-color--lightest, #f2f2f2);
+}
+
+table.benchmark-table tbody tr:hover {
+    background: var(--md-accent-fg-color--transparent, rgba(0, 0, 0, 0.03));
+}
+
+table.benchmark-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+table.benchmark-table th.sortable::after {
+    content: ' ↕';
+    opacity: 0.35;
+    font-size: 0.85em;
+}
+
+table.benchmark-table th[data-sort='asc']::after {
+    content: ' ↑';
+    opacity: 1;
+}
+
+table.benchmark-table th[data-sort='desc']::after {
+    content: ' ↓';
+    opacity: 1;
+}
