@@ -17,4 +17,5 @@ Benchmarks for
   and the LAL baseline, per approximant.
 
 All figures and tables are generated from the committed records under
-`data/signal/`. To add your own results, see [Contributing](../contributing.md).
+`data/signal/`. To add your own results, see
+[Contribute a benchmark](../contribute.md).

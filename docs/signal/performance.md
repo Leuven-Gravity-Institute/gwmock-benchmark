@@ -48,4 +48,4 @@ counts.
     ```
 
     Then open a pull request adding the data file — figures and tables regenerate
-    automatically. See [Contributing](../contributing.md).
+    automatically. See [Contribute a benchmark](../contribute.md).
