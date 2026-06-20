@@ -5,7 +5,7 @@ description: Hello world functions.
 
 <!-- prettier-ignore-start -->
 
-::: python_package_template.hello_world
+::: gwmock_benchmark.hello_world
     options:
         show_root_heading: false
         heading_level: 2

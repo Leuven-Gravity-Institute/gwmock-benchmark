@@ -1,5 +1,5 @@
 # ruff: noqa PL0415
-"""Main entry point for the python_package_template CLI application."""
+"""Main entry point for the gwmock_benchmark CLI application."""
 
 from __future__ import annotations
 
@@ -39,7 +39,7 @@ def setup_logging(level: LoggingLevel = LoggingLevel.INFO) -> None:
     from rich.console import Console
     from rich.logging import RichHandler
 
-    logger = logging.getLogger("python_package_template")
+    logger = logging.getLogger("gwmock_benchmark")
 
     logger.setLevel(level.value)
 
@@ -84,7 +84,7 @@ def main(
 
 def register_commands() -> None:
     """Register CLI commands."""
-    from python_package_template.cli.hello import hello_command
+    from gwmock_benchmark.cli.hello import hello_command
 
     app.command(name="hello")(hello_command)
 

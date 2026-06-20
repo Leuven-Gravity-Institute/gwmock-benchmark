@@ -56,30 +56,6 @@ nav = [
   ] },
   { "Contributing" = "contributing.md" },
   { "Security" = "security.md" },
-  { "Template documentation" = [
-    { "Overview" = "template_documentation/index.md" },
-    { "Using this GitHub template" = [
-      { "Overview" = "template_documentation/onboarding/index.md" },
-      { "Template quick start" = "template_documentation/onboarding/quick_start.md" },
-      { "Customize and clean up" = "template_documentation/onboarding/customize_repository.md" },
-    ] },
-    { "User guide" = [
-      { "Installation" = "template_documentation/user_guide/installation.md" },
-      { "Quick start" = "template_documentation/user_guide/quick_start.md" },
-      { "Project structure" = "template_documentation/user_guide/project_structure.md" },
-      { "Development tools" = "template_documentation/user_guide/development_tools.md" },
-      { "Testing" = "template_documentation/user_guide/testing.md" },
-      { "Documentation" = "template_documentation/user_guide/documentation.md" },
-      { "CI/CD" = "template_documentation/user_guide/ci_cd.md" },
-      { "Packaging" = "template_documentation/user_guide/packaging.md" },
-      { "Customization" = "template_documentation/user_guide/customization.md" },
-    ] },
-    { "Development notes" = [
-      { "Code quality" = "template_documentation/development/code_quality.md" },
-      { "Changelog" = "template_documentation/development/changelog.md" },
-      { "Troubleshooting" = "template_documentation/development/troubleshooting.md" },
-    ] },
-  ] },
 ]
 
 # With the "extra_css" option you can add your own CSS styling to customize
