@@ -17,12 +17,19 @@ JIT/XLA compilation and a **warm** steady-state run — and records both wall
 times, the `compile_seconds` difference, throughput, core-hours, peak memory,
 and output size. The **warm** numbers are the headline: at catalogue scale the
 one-time compile amortizes away, so steady state is what a year-long run
-actually sees. The cold bars are kept beside it because a GPU's compile is
+actually sees. The cold points are kept beside it because a GPU's compile is
 larger than a CPU's, which can mask the device's advantage at small event
 counts.
 
-The charts are interactive — hover for exact values, click the legend to isolate
-cold or warm, and use the chart menu to export. The table below is sortable and
+The charts are **scatter plots over the waveform model** (x-axis): each
+backend/method/hardware cell is a coloured point, so the hardware comparison
+lives in the colour legend and models sit side by side. Cold and warm appear as
+different point shapes, and models are sorted with the **best result on the
+left** (highest throughput, lowest wall time / memory). The `gwmock-signal`
+version each cell was produced with is shown in the tooltip and the table.
+
+The charts are interactive — hover for exact values, click a cell in the legend
+to isolate it, and use the chart menu to export. The table below is sortable and
 searchable.
 
 --8<-- "docs/signal/generated/performance-charts.md"

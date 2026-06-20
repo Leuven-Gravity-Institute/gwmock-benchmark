@@ -460,6 +460,17 @@ def _metric(record: dict, key: str) -> float:
     return float(record["metrics"].get(key) or 0.0)
 
 
+def _signal_version(record: dict) -> str:
+    """Return the gwmock-signal version this record was produced with."""
+    prov = record["provenance"]
+    return prov.get("package_version") or (prov.get("library_versions") or {}).get(PACKAGE) or "—"
+
+
+def _approximant(record: dict) -> str:
+    """Return the waveform model a record exercises (consistency labels are the model)."""
+    return record["configuration"].get("approximant") or record["label"]
+
+
 def _short_device(name: str) -> str:
     """Shorten a CPU/GPU model for compact chart x-axis labels."""
     import re
@@ -484,7 +495,9 @@ def _performance_table(records: list[dict]) -> str:
     """Return an HTML table of the performance records (warm is the headline)."""
     headers = [
         "cell",
+        "model",
         "device",
+        "gwmock-signal",
         "warm ev/s",
         "cold wall (s)",
         "warm wall (s)",
@@ -495,7 +508,9 @@ def _performance_table(records: list[dict]) -> str:
     rows = [
         [
             record["label"],
+            _approximant(record),
             _device(record),
+            _signal_version(record),
             f"{_metric(record, 'events_per_second_warm'):.0f}",
             f"{_metric(record, 'wall_seconds_cold'):.0f}",
             f"{_metric(record, 'wall_seconds_warm'):.0f}",
@@ -517,10 +532,11 @@ def _log_overlap_loss(overlap: float) -> float:
 
 def _consistency_table(records: list[dict]) -> str:
     """Return an HTML table of ripple-vs-LAL overlap (no maximization) per approximant."""
-    headers = ["Approximant", "f_min (Hz)", "worst overlap", "worst log₁₀ loss", "median log₁₀ loss"]
+    headers = ["Approximant", "gwmock-signal", "f_min (Hz)", "worst overlap", "worst log₁₀ loss", "median log₁₀ loss"]
     rows = [
         [
             record["label"],
+            _signal_version(record),
             record["configuration"].get("minimum_frequency", ""),
             f"{_metric(record, 'min_overlap'):.6f}",
             f"{_log_overlap_loss(_metric(record, 'min_overlap')):.2f}",
@@ -535,9 +551,11 @@ def _performance_chart_rows(records: list[dict]) -> list[dict]:
     """Return chart-ready rows for the performance records (one per cell)."""
     return [
         {
-            "name": f"{record['label']} · {_short_device(_device(record))}",
+            "approximant": _approximant(record),
+            "cell": f"{record['label']} · {_short_device(_device(record))}",
             "label": record["label"],
             "device": _device(record),
+            "version": _signal_version(record),
             "throughput_cold": _metric(record, "events_per_second_cold"),
             "throughput_warm": _metric(record, "events_per_second_warm"),
             "wall_cold": _metric(record, "wall_seconds_cold"),
@@ -557,6 +575,7 @@ def _consistency_chart_rows(records: list[dict]) -> list[dict]:
             "approximant": record["label"],
             "label": record["label"],
             "device": _device(record),
+            "version": _signal_version(record),
             "worst_overlap": _metric(record, "min_overlap"),
             "worst_log_loss": _log_overlap_loss(_metric(record, "min_overlap")),
             "median_log_loss": _log_overlap_loss(_metric(record, "median_overlap")),
