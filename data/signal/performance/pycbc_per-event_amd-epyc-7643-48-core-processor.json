@@ -1,0 +1,56 @@
+{
+    "configuration": {
+        "approximant": "IMRPhenomD",
+        "backend": "pycbc",
+        "chunk_size": null,
+        "detectors": ["H1", "L1", "V1"],
+        "end_time": 1126267654.0,
+        "method": "per-event",
+        "minimum_frequency": 20.0,
+        "n_chirp_mass_bins": 1,
+        "n_events": 5000,
+        "sampling_frequency": 4096.0,
+        "segment_duration": 64.0,
+        "start_time": 1126259462.0
+    },
+    "label": "pycbc per-event (CPU)",
+    "metrics": {
+        "average_rss_bytes": 1486184697.577061,
+        "compile_seconds": 3.9387086009955965,
+        "cpu_core_hours_cold": 1.2654706139067033,
+        "cpu_core_hours_warm": 1.2567179281267131,
+        "events_per_second_cold": 8.780220566963143,
+        "events_per_second_warm": 8.841372325827752,
+        "gpu_hours_cold": 0.0,
+        "gpu_hours_warm": 0.0,
+        "gpu_peak_bytes": 0,
+        "output_bytes": 805306368,
+        "peak_rss_bytes": 2357157888,
+        "wall_seconds_cold": 569.4617762580165,
+        "wall_seconds_warm": 565.5230676570209
+    },
+    "package": "gwmock-signal",
+    "provenance": {
+        "cpu_model": "AMD EPYC 7643 48-Core Processor",
+        "gpu_models": [],
+        "gwmock_benchmark_version": null,
+        "library_versions": {
+            "gwmock-signal": "0.9.0",
+            "gwpy": "4.0.1",
+            "jax": "0.10.2",
+            "jaxlib": "0.10.2",
+            "lalsuite": "7.26.15",
+            "numpy": "2.3.5",
+            "pycbc": "2.11.0",
+            "ripplegw": "0.2.0"
+        },
+        "n_cpu_cores": 8,
+        "n_gpus": 0,
+        "package": "gwmock-signal",
+        "package_version": "0.9.0",
+        "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+        "python_version": "3.13.2"
+    },
+    "schema_version": 1,
+    "suite": "performance"
+}

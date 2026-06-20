@@ -1,0 +1,35 @@
+{
+    "configuration": {
+        "minimum_frequency": 40.0,
+        "n_matches": 4
+    },
+    "label": "IMRPhenomXAS_NRTidalv3",
+    "metrics": {
+        "median_match": 0.999959945668274,
+        "min_match": 0.9999025258532449
+    },
+    "package": "gwmock-signal",
+    "provenance": {
+        "cpu_model": "AMD EPYC 7643 48-Core Processor",
+        "gpu_models": [],
+        "gwmock_benchmark_version": null,
+        "library_versions": {
+            "gwmock-signal": "0.9.0",
+            "gwpy": "4.0.1",
+            "jax": "0.10.2",
+            "jaxlib": "0.10.2",
+            "lalsuite": "7.26.15",
+            "numpy": "2.3.5",
+            "pycbc": "2.11.0",
+            "ripplegw": "0.2.0"
+        },
+        "n_cpu_cores": 4,
+        "n_gpus": 0,
+        "package": "gwmock-signal",
+        "package_version": "0.9.0",
+        "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+        "python_version": "3.13.2"
+    },
+    "schema_version": 1,
+    "suite": "consistency"
+}

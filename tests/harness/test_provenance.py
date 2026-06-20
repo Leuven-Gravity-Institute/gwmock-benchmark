@@ -21,6 +21,11 @@ def test_provenance_has_core_fields():
     assert prov["n_cpu_cores"] >= 1
 
 
+def test_no_hostname_recorded():
+    """Provenance omits the hostname — records are public and must not leak the node."""
+    assert "hostname" not in provenance()
+
+
 def test_absent_package_version_is_none():
     """An uninstalled benchmarked package yields a null package_version."""
     prov = provenance(package="definitely-not-installed-xyz")
