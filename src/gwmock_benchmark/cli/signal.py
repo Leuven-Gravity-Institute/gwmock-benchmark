@@ -99,3 +99,32 @@ def consistency(  # noqa: PLR0913 - CLI options map one-to-one to suite knobs
     for record in records:
         path = write_record(output_dir / f"{record['label']}.json", record)
         typer.echo(f"{record['label']}: worst overlap={record['metrics']['min_overlap']:.6f} -> {path}")
+
+
+@signal_app.command("verify-consistency", no_args_is_help=True)
+def verify_consistency(
+    data_dir: Annotated[Path, typer.Option("--data-dir", help="Directory of committed consistency records.")] = Path(
+        "data/signal/consistency"
+    ),
+    tolerance: Annotated[float, typer.Option(help="Max |delta log10(1-overlap)| allowed.")] = 0.5,
+) -> None:
+    """Re-run the deterministic ripple-vs-LAL match and assert committed records reproduce.
+
+    The overlap is hardware-independent, so a genuine record reproduces to machine
+    precision against the same toolchain. A fabricated overlap cannot. Exits non-zero
+    if any committed record fails to reproduce within ``tolerance``.
+    """
+    from gwmock_benchmark.harness import load_records
+    from gwmock_benchmark.suites import signal
+
+    if not data_dir.is_dir():
+        raise typer.BadParameter(f"no consistency data directory at {data_dir}")
+
+    records = load_records(data_dir)
+    problems = signal.reproduce_consistency(records, tolerance=tolerance)
+    if problems:
+        typer.echo("consistency records that did NOT reproduce:")
+        for problem in problems:
+            typer.echo(f"  - {problem}")
+        raise typer.Exit(code=1)
+    typer.echo(f"all {len([r for r in records if r.get('suite') == 'consistency'])} consistency records reproduced")
