@@ -16,6 +16,7 @@ from gwmock_benchmark.harness.record import (
     validate_record,
     write_record,
 )
+from gwmock_benchmark.harness.submit import render_htcondor, render_slurm, walltime_to_seconds
 
 __all__ = [
     "MAX_RECORD_BYTES",
@@ -26,6 +27,9 @@ __all__ = [
     "make_record",
     "measure",
     "provenance",
+    "render_htcondor",
+    "render_slurm",
     "validate_record",
+    "walltime_to_seconds",
     "write_record",
 ]
