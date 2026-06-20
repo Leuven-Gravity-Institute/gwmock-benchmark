@@ -79,10 +79,6 @@ jobs:
 
             - name: Publish to TestPyPI
               uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
-              # Remove this line if you want the workflow to fail on publish errors
-              # This is added for this template only since the environment 'testpypi' is
-              # not created to avoid publishing
-              continue-on-error: true
               with:
                   repository-url: https://test.pypi.org/legacy/
                   packages-dir: dist/
