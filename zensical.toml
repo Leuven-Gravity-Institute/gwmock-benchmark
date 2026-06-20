@@ -11,13 +11,13 @@
 # The site_name is shown in the page header and the browser window title
 #
 # Read more: https://zensical.org/docs/setup/basics/#site_name
-site_name = "Python Package Template Documentation"
+site_name = "gwmock-benchmark Documentation"
 
 # The site_description is included in the HTML head and should contain a
 # meaningful description of the site content for use by search engines.
 #
 # Read more: https://zensical.org/docs/setup/basics/#site_description
-site_description = "A GitHub template repository for a Python package."
+site_description = "Shared benchmarking for the gwmock packages: one harness, the committed results, and the rendered report site — in one place."
 
 # The site_author attribute. This is used in the HTML head element.
 #
@@ -36,6 +36,17 @@ site_author = "Isaac C. F. Wong"
 copyright = """
 Copyright &copy; 2026 Isaac C. F. Wong
 """
+
+# Canonical URL for the published documentation site.
+# Read more: https://zensical.org/docs/setup/basics/#site_url
+site_url = "https://leuven-gravity-institute.github.io/gwmock-benchmark/"
+
+# Repository link in the header (top right on wide screens). For public GitHub
+# repos, Zensical also fetches and displays star and fork counts at runtime.
+# Read more: https://zensical.org/docs/setup/repository/
+repo_url = "https://github.com/Leuven-Gravity-Institute/gwmock-benchmark"
+repo_name = "Leuven-Gravity-Institute/gwmock-benchmark"
+edit_uri = "edit/main/docs/"
 
 # Zensical supports both implicit navigation and explicitly defined navigation.
 # If you decide not to define a navigation here then Zensical will simply
@@ -318,16 +329,36 @@ toggle.name = "Switch to light mode"
 # - https://zensical.org/docs/setup/logo-and-icons
 # - https://zensical.org/docs/authoring/icons-emojis/#search
 # ----------------------------------------------------------------------------
-#[project.theme.icon]
+[project.theme.icon]
 #logo = "lucide/smile"
-#repo = "lucide/smile"
+repo = "fontawesome/brands/github"
 
 # ----------------------------------------------------------------------------
 # The "extra" section contains miscellaneous settings.
 # ----------------------------------------------------------------------------
-#[[project.extra.social]]
-#icon = "fontawesome/brands/github"
-#link = "https://github.com/user/repo"
+[project.extra.repo]
+stars = true
+forks = true
+
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/Leuven-Gravity-Institute/gwmock-benchmark"
+name = "gwmock-benchmark on GitHub"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/python"
+link = "https://pypi.org/project/gwmock-benchmark/"
+name = "gwmock-benchmark on PyPI"
+
+[[project.extra.social]]
+icon = "fontawesome/solid/comments"
+link = "https://github.com/Leuven-Gravity-Institute/gwmock-benchmark/discussions"
+name = "Community discussions on GitHub"
+
+[[project.extra.social]]
+icon = "fontawesome/solid/circle-dot"
+link = "https://github.com/Leuven-Gravity-Institute/gwmock-benchmark/issues"
+name = "Report an issue"
 
 [project.plugins.mkdocstrings.handlers.python]
 inventories = ["https://docs.python.org/3/objects.inv"]
