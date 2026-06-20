@@ -1,6 +1,7 @@
 cff-version: 1.2.0
 title:
-    'python-package-template: A GitHub template repository for a Python package'
+    'gwmock-benchmark: Shared benchmarking harness, results, and reports for the
+    gwmock packages'
 license: 'GPL-3.0-or-later'
 type: software
 authors:
@@ -9,6 +10,6 @@ authors:
       affiliation: KU Leuven
       orcid: 'https://orcid.org/0000-0003-2166-0027'
 keywords:
-    - python
-    - github
-    - template
+    - gravitational-waves
+    - benchmark
+    - mock-data-challenge
