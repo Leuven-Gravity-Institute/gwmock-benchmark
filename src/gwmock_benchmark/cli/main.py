@@ -84,10 +84,8 @@ def main(
 
 def register_commands() -> None:
     """Register CLI commands."""
-    from gwmock_benchmark.cli.hello import hello_command
     from gwmock_benchmark.cli.signal import signal_app
 
-    app.command(name="hello")(hello_command)
     app.add_typer(signal_app)
 
 
