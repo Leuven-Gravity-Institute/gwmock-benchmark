@@ -268,17 +268,68 @@
         return groupedSpec(rows, xField, def)
     }
 
-    function render(container) {
-        if (container.dataset.rendered === 'true') return
+    // Charts drawn on the current page: re-embedded (not just recoloured) when the
+    // light/dark palette toggles, so axes, text, and legends follow the theme.
+    var drawn = []
+
+    // Material/zensical sets data-md-color-scheme="slate" on <body> for dark mode.
+    // Override only the chrome (text, axes, legend, grid); data colours are shared.
+    function themeConfig() {
+        var dark =
+            document.body.getAttribute('data-md-color-scheme') === 'slate'
+        if (!dark) return { background: 'transparent' }
+        var fg = '#e3e3e3'
+        var muted = '#9aa0a6'
+        var grid = '#3a3f44'
+        return {
+            background: 'transparent',
+            title: { color: fg, subtitleColor: muted },
+            axis: {
+                labelColor: muted,
+                titleColor: fg,
+                gridColor: grid,
+                domainColor: grid,
+                tickColor: grid,
+            },
+            legend: { labelColor: muted, titleColor: fg },
+            view: { stroke: 'transparent' },
+        }
+    }
+
+    function embed(chart) {
+        // Tear down a prior render so a theme toggle replaces rather than stacks.
+        if (chart.view && chart.view.finalize) chart.view.finalize()
+        chart.div.innerHTML = ''
+        window
+            .vegaEmbed(chart.div, chart.spec, {
+                actions: {
+                    export: true,
+                    source: false,
+                    compiled: false,
+                    editor: false,
+                },
+                renderer: 'svg',
+                config: themeConfig(),
+            })
+            .then(function (result) {
+                chart.view = result.view
+            })
+            .catch(function () {})
+    }
+
+    function drawAll() {
+        if (typeof window.vegaEmbed === 'undefined') return
+        drawn.forEach(embed)
+    }
+
+    function build(container) {
         var group = container.getAttribute('data-group')
         var suite = container.getAttribute('data-suite')
         var config = SUITES[suite]
         var script = document.querySelector(
             'script.benchmark-chart-data[data-group="' + group + '"]'
         )
-        if (!config || !script || typeof window.vegaEmbed === 'undefined')
-            return
-        container.dataset.rendered = 'true'
+        if (!config || !script) return
 
         var rows
         try {
@@ -291,20 +342,34 @@
             var div = document.createElement('div')
             div.className = 'benchmark-chart'
             container.appendChild(div)
-            window.vegaEmbed(div, specFor(rows, config.xField, def), {
-                actions: {
-                    export: true,
-                    source: false,
-                    compiled: false,
-                    editor: false,
-                },
-                renderer: 'svg',
-            })
+            drawn.push({ div: div, spec: specFor(rows, config.xField, def) })
+        })
+    }
+
+    // Redraw every chart whenever the body's colour scheme attribute changes.
+    var watching = false
+    function watchTheme() {
+        if (watching || typeof MutationObserver === 'undefined') return
+        watching = true
+        new MutationObserver(function (mutations) {
+            if (
+                mutations.some(
+                    (m) => m.attributeName === 'data-md-color-scheme'
+                )
+            )
+                drawAll()
+        }).observe(document.body, {
+            attributes: true,
+            attributeFilter: ['data-md-color-scheme'],
         })
     }
 
     function init() {
-        document.querySelectorAll('.benchmark-charts').forEach(render)
+        // Instant navigation swaps the DOM, so rebuild from the current page's nodes.
+        drawn = []
+        document.querySelectorAll('.benchmark-charts').forEach(build)
+        drawAll()
+        watchTheme()
     }
 
     if (typeof window.document$ !== 'undefined' && window.document$.subscribe) {
