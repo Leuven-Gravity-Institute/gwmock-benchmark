@@ -36,3 +36,25 @@ jobs:
               uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
+
+    # Exercises the gwmock-signal suite end to end: installs the [signal] extra
+    # (gwmock-signal[jax,pycbc] -> lalsuite, jax, ripplegw, pycbc) and runs the
+    # integration tests that actually generate waveforms.
+    test-signal:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+              with:
+                  python-version: '3.13'
+                  enable-cache: 'true'
+
+            - name: Install dependencies (with signal extra)
+              run: uv sync --group dev --extra signal --frozen
+
+            - name: Run signal suite integration tests
+              run:
+                  uv run --frozen pytest -m integration
+                  tests/suites/test_signal.py

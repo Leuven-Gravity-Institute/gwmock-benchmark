@@ -22,8 +22,8 @@ class LoggingLevel(str, enum.Enum):
 
 # Create the main Typer app
 app = typer.Typer(
-    name="package_name",
-    help="Main CLI for package_name.",
+    name="gwmock-benchmark",
+    help="Benchmarking harness, runners, and reports for the gwmock packages.",
     rich_markup_mode="rich",
 )
 
@@ -85,8 +85,10 @@ def main(
 def register_commands() -> None:
     """Register CLI commands."""
     from gwmock_benchmark.cli.hello import hello_command
+    from gwmock_benchmark.cli.signal import signal_app
 
     app.command(name="hello")(hello_command)
+    app.add_typer(signal_app)
 
 
 register_commands()
