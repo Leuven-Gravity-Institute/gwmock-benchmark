@@ -9,6 +9,7 @@
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![SPEC 0 — Minimum Supported Dependencies](https://img.shields.io/badge/SPEC-0-green?labelColor=%23004811&color=%235CA038)](https://scientific-python.org/specs/spec-0000/)
+[![DOI](https://zenodo.org/badge/1275019674.svg)](https://doi.org/10.5281/zenodo.20777458)
 
 Shared benchmarking for the **gwmock** packages: one harness, the committed
 results, and the rendered report site — in one place.
