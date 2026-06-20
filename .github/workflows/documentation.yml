@@ -32,6 +32,13 @@ jobs:
             - name: Install dependencies
               run: uv sync --group docs --frozen
 
+            # Render figures + table snippets from the committed data/ before building
+            # (zensical has no in-renderer hook); contributors submit data only.
+            - name: Aggregate benchmark data into the docs
+              run:
+                  uv run --frozen gwmock-benchmark aggregate --data-dir data
+                  --docs-dir docs
+
             - run: uv run --frozen zensical build
 
             - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4

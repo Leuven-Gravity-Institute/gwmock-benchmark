@@ -18,7 +18,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from gwmock_benchmark.harness import make_record, measure, provenance
+from gwmock_benchmark.harness import grouped_bar, make_record, measure, provenance, single_bar
 
 PACKAGE = "gwmock-signal"
 _LIBRARIES = ("ripplegw", "jax", "jaxlib", "lalsuite", "pycbc", "numpy", "gwpy")
@@ -403,3 +403,129 @@ def run_consistency(  # noqa: PLR0913 - each measurement knob is an explicit key
             )
         )
     return records
+
+
+# --- rendering: figures + table snippets from committed records ----------------
+
+
+def _device(record: dict) -> str:
+    """Return the hardware label for a record: its GPU if a GPU run, else its CPU."""
+    prov = record["provenance"]
+    gpus = prov.get("gpu_models") or []
+    return gpus[0] if prov.get("n_gpus") and gpus else (prov.get("cpu_model") or "unknown")
+
+
+def _metric(record: dict, key: str) -> float:
+    """Return a metric as a float, treating missing/None as 0."""
+    return float(record["metrics"].get(key) or 0.0)
+
+
+def _version_subtitle(records: list[dict]) -> str:
+    """Return a 'gwmock-signal <versions>' subtitle for the figures."""
+    versions = sorted({r["provenance"].get("package_version") or "?" for r in records})
+    return f"{PACKAGE} {', '.join(versions)}"
+
+
+def _performance_table(records: list[dict]) -> str:
+    """Return a Markdown table of the performance records (warm is the headline)."""
+    header = (
+        "| cell | device | warm ev/s | cold/warm wall (s) | compile (s) | peak mem (GB) | output (GB) |\n"
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: |\n"
+    )
+    rows = []
+    for record in records:
+        rows.append(
+            f"| {record['label']} | {_device(record)} | {_metric(record, 'events_per_second_warm'):.0f} | "
+            f"{_metric(record, 'wall_seconds_cold'):.0f} / {_metric(record, 'wall_seconds_warm'):.0f} | "
+            f"{_metric(record, 'compile_seconds'):.1f} | {_metric(record, 'peak_rss_bytes') / 1e9:.1f} | "
+            f"{_metric(record, 'output_bytes') / 1e9:.2f} |"
+        )
+    return header + "\n".join(rows) + "\n"
+
+
+def _consistency_table(records: list[dict]) -> str:
+    """Return a Markdown table of ripple-vs-LAL matches per approximant."""
+    header = "| Approximant | f_min (Hz) | worst match | median match |\n| --- | ---: | ---: | ---: |\n"
+    rows = [
+        f"| `{r['label']}` | {r['configuration'].get('minimum_frequency', '')!s} | "
+        f"{_metric(r, 'min_match'):.5f} | {_metric(r, 'median_match'):.5f} |"
+        for r in records
+    ]
+    return header + "\n".join(rows) + "\n"
+
+
+def render(records: list[dict], output_dir: Path) -> list[Path]:
+    """Render figures + table snippets for the gwmock-signal records under ``output_dir``.
+
+    Writes SVG figures to ``output_dir/figures`` and Markdown table snippets to
+    ``output_dir/generated``. Returns the paths written.
+    """
+    figures = output_dir / "figures"
+    generated = output_dir / "generated"
+    generated.mkdir(parents=True, exist_ok=True)
+    written: list[Path] = []
+
+    performance = sorted((r for r in records if r["suite"] == "performance"), key=lambda r: r["label"])
+    consistency = sorted((r for r in records if r["suite"] == "consistency"), key=lambda r: r["label"])
+
+    if performance:
+        subtitle = _version_subtitle(performance)
+        labels = [f"{r['label']}\n{_device(r)}" for r in performance]
+        paired = [
+            ("events_per_second", "Throughput [events/s]", "performance_throughput.svg"),
+            ("wall_seconds", "Wall time [s]", "performance_walltime.svg"),
+            ("cpu_core_hours", "CPU core-hours", "performance_cpu_core_hours.svg"),
+            ("gpu_hours", "GPU-hours", "performance_gpu_hours.svg"),
+        ]
+        for stem, ylabel, filename in paired:
+            cold = [_metric(r, f"{stem}_cold") for r in performance]
+            warm = [_metric(r, f"{stem}_warm") for r in performance]
+            if not any(cold) and not any(warm):
+                continue  # e.g. no GPU runs -> skip GPU-hours
+            written.append(
+                grouped_bar(
+                    figures / filename,
+                    labels=labels,
+                    cold=cold,
+                    warm=warm,
+                    ylabel=ylabel,
+                    title=f"{ylabel} - cold vs warm\n{subtitle}",
+                )
+            )
+        singles = [
+            ([_metric(r, "compile_seconds") for r in performance], "One-time compile [s]", "performance_compile.svg"),
+            (
+                [_metric(r, "peak_rss_bytes") / 1e9 for r in performance],
+                "Peak memory [GB]",
+                "performance_peak_memory.svg",
+            ),
+            ([_metric(r, "output_bytes") / 1e9 for r in performance], "Output data [GB]", "performance_output.svg"),
+        ]
+        for values, ylabel, filename in singles:
+            if not any(values):
+                continue
+            written.append(
+                single_bar(
+                    figures / filename, labels=labels, values=values, ylabel=ylabel, title=f"{ylabel}\n{subtitle}"
+                )
+            )
+        table = generated / "performance-table.md"
+        table.write_text(_performance_table(performance))
+        written.append(table)
+
+    if consistency:
+        subtitle = _version_subtitle(consistency)
+        written.append(
+            single_bar(
+                figures / "consistency_matches.svg",
+                labels=[r["label"] for r in consistency],
+                values=[_metric(r, "min_match") for r in consistency],
+                ylabel="worst-case match",
+                title=f"ripple vs LAL - worst-case match\n{subtitle}",
+            )
+        )
+        table = generated / "consistency-table.md"
+        table.write_text(_consistency_table(consistency))
+        written.append(table)
+
+    return written

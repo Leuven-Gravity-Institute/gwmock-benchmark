@@ -84,11 +84,13 @@ def main(
 
 def register_commands() -> None:
     """Register CLI commands."""
+    from gwmock_benchmark.cli.aggregate import aggregate_command
     from gwmock_benchmark.cli.signal import signal_app
     from gwmock_benchmark.cli.submit import submit_command
 
     app.add_typer(signal_app)
     app.command(name="submit")(submit_command)
+    app.command(name="aggregate")(aggregate_command)
 
 
 register_commands()

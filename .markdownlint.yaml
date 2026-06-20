@@ -6,6 +6,8 @@ MD013:
     headings: false
     # Allow code blocks to exceed line length
     code_blocks: false
+    # Allow tables (generated) to exceed line length
+    tables: false
 
 # Require ATX-style headings (# instead of = or -)
 MD003:
@@ -38,5 +40,11 @@ MD036: false
 # Lists should be surrounded by blank lines
 MD032: true
 
+# pymdownx/Material admonitions (`!!! note`, …) indent the body; MD046 misreads
+# that as an indented code block. Fenced blocks remain the norm elsewhere.
 MD046:
+    enabled: false
     style: fenced
+
+# Allow a YAML front-matter title alongside the page's single `# H1`.
+MD025: false
