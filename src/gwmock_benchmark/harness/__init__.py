@@ -6,6 +6,7 @@ dependencies and imports cleanly without any optional package installed.
 
 from __future__ import annotations
 
+from gwmock_benchmark.harness.dataset_api import API_VERSION, build_record_schema, write_dataset_api
 from gwmock_benchmark.harness.measure import ResourceUsage, measure
 from gwmock_benchmark.harness.provenance import allocated_cpu_cores, provenance
 from gwmock_benchmark.harness.record import (
@@ -20,10 +21,12 @@ from gwmock_benchmark.harness.submit import render_htcondor, render_slurm, wallt
 from gwmock_benchmark.harness.validate import check_provenance, close
 
 __all__ = [
+    "API_VERSION",
     "MAX_RECORD_BYTES",
     "SCHEMA_VERSION",
     "ResourceUsage",
     "allocated_cpu_cores",
+    "build_record_schema",
     "check_provenance",
     "close",
     "load_records",
@@ -34,5 +37,6 @@ __all__ = [
     "render_slurm",
     "validate_record",
     "walltime_to_seconds",
+    "write_dataset_api",
     "write_record",
 ]
