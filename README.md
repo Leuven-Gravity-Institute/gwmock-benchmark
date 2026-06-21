@@ -31,6 +31,23 @@ Records are tiny (~1–2 KB), carry full provenance (CPU/GPU model, library
 versions — no hostnames), and are capped at 16 KB so the dataset stays light in
 the repository.
 
+## Data API
+
+The committed records are published as **static JSON** at stable URLs, so you
+can retrieve the full dataset programmatically instead of scraping the figures
+and tables. Start at the manifest and follow its links:
+
+```text
+https://leuven-gravity-institute.github.io/gwmock-benchmark/data/v1/index.json     # manifest: versions, counts, links
+https://leuven-gravity-institute.github.io/gwmock-benchmark/data/v1/records.json   # every record, one request
+.../data/v1/<package>/<suite>.json                                                 # e.g. signal/performance.json
+.../data/v1/schema/record-v1.json                                                  # JSON Schema for a record
+```
+
+See the
+**[Data API](https://leuven-gravity-institute.github.io/gwmock-benchmark/data-api/)**
+page for the endpoints, the record schema, and `curl`/Python examples.
+
 ## Benchmarked packages
 
 | Package                                                                    | Suites                   | Extra                      |
