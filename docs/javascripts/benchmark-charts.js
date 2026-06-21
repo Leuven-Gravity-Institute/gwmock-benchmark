@@ -270,6 +270,13 @@
 
     // Charts rendered on the page, kept so a palette toggle can re-embed them.
     var rendered = []
+    var retryTimer
+    var resizeObserver =
+        typeof ResizeObserver === 'undefined'
+            ? null
+            : new ResizeObserver(function () {
+                  scheduleSweep(50)
+              })
 
     // Material/zensical sets data-md-color-scheme="slate" on <body> for dark mode.
     // Override only the chrome (text, axes, legend, grid); data colours are shared.
@@ -295,11 +302,80 @@
         }
     }
 
+    function scheduleSweep(delay) {
+        if (retryTimer) return
+        retryTimer = setTimeout(function () {
+            retryTimer = null
+            sweepUntilReady()
+        }, delay || 50)
+    }
+
+    function afterLayout(callback) {
+        if (typeof requestAnimationFrame !== 'undefined') {
+            requestAnimationFrame(function () {
+                requestAnimationFrame(callback)
+            })
+            return
+        }
+        setTimeout(callback, 50)
+    }
+
+    function chartTargetsReady(charts) {
+        return charts.every(function (chart) {
+            return chart.div.getBoundingClientRect().width > 0
+        })
+    }
+
+    function waitForChartTargets(charts, attempt) {
+        attempt = attempt || 0
+        return new Promise(function (resolve, reject) {
+            afterLayout(function () {
+                if (chartTargetsReady(charts)) {
+                    resolve()
+                    return
+                }
+                if (attempt >= 120) {
+                    reject(new Error('chart container never became visible'))
+                    return
+                }
+                waitForChartTargets(charts, attempt + 1).then(resolve, reject)
+            })
+        })
+    }
+
+    function chartSvgReady(chart) {
+        var svg = chart.div.querySelector('.vega-embed svg')
+        if (!svg) return false
+        var box = svg.getBoundingClientRect()
+        return box.width > 0 && box.height > 0
+    }
+
+    function renderedChartsReady(charts) {
+        return charts.every(chartSvgReady)
+    }
+
+    function waitForRenderedCharts(charts, attempt) {
+        attempt = attempt || 0
+        return new Promise(function (resolve, reject) {
+            afterLayout(function () {
+                if (renderedChartsReady(charts)) {
+                    resolve()
+                    return
+                }
+                if (attempt >= 20) {
+                    reject(new Error('chart rendered with zero size'))
+                    return
+                }
+                waitForRenderedCharts(charts, attempt + 1).then(resolve, reject)
+            })
+        })
+    }
+
     function embed(chart) {
         // Tear down a prior render so a theme toggle replaces rather than stacks.
         if (chart.view && chart.view.finalize) chart.view.finalize()
         chart.div.innerHTML = ''
-        window
+        return window
             .vegaEmbed(chart.div, chart.spec, {
                 actions: {
                     export: true,
@@ -312,21 +388,41 @@
             })
             .then(function (result) {
                 chart.view = result.view
+                return chart
             })
-            .catch(function () {})
+    }
+
+    function clearCharts(charts) {
+        charts.forEach(function (chart) {
+            if (chart.view && chart.view.finalize) chart.view.finalize()
+        })
+        rendered = rendered.filter(function (chart) {
+            return charts.indexOf(chart) === -1
+        })
+    }
+
+    function observeContainer(container) {
+        if (!resizeObserver || container.dataset.benchmarkObserved === 'true') {
+            return
+        }
+        resizeObserver.observe(container)
+        container.dataset.benchmarkObserved = 'true'
     }
 
     // Render one container's charts, once. Returns false to signal "try again later"
-    // when Vega has not loaded yet or the container has no width (layout not settled —
+    // when Vega has not loaded yet or the container has no width (layout not settled -
     // a `width: 'container'` spec would otherwise measure 0 and render invisibly).
     function renderContainer(container) {
         if (container.dataset.benchmarkRendered === 'true') return true
+        if (container.dataset.benchmarkPending === 'true') return true
+        observeContainer(container)
         var group = container.getAttribute('data-group')
         var config = SUITES[container.getAttribute('data-suite')]
         var script = document.querySelector(
             'script.benchmark-chart-data[data-group="' + group + '"]'
         )
-        if (!config || !script) return true // nothing renderable here
+        if (!config) return true // nothing renderable here
+        if (!script) return false
         if (typeof window.vegaEmbed === 'undefined') return false
         if (container.getBoundingClientRect().width === 0) return false
 
@@ -336,16 +432,39 @@
         } catch (error) {
             return true
         }
+        container.dataset.benchmarkPending = 'true'
         container.innerHTML = ''
+        var charts = []
         config.charts.forEach(function (def) {
             var div = document.createElement('div')
             div.className = 'benchmark-chart'
             container.appendChild(div)
             var chart = { div: div, spec: specFor(rows, config.xField, def) }
-            rendered.push(chart)
-            embed(chart)
+            charts.push(chart)
         })
-        container.dataset.benchmarkRendered = 'true'
+        waitForChartTargets(charts)
+            .then(function () {
+                return Promise.all(charts.map(embed))
+            })
+            .then(function () {
+                return waitForRenderedCharts(charts)
+            })
+            .then(function () {
+                delete container.dataset.benchmarkPending
+                if (!container.isConnected) {
+                    clearCharts(charts)
+                    return
+                }
+                rendered = rendered.concat(charts)
+                container.dataset.benchmarkRendered = 'true'
+            })
+            .catch(function () {
+                clearCharts(charts)
+                container.innerHTML = ''
+                delete container.dataset.benchmarkPending
+                delete container.dataset.benchmarkRendered
+                scheduleSweep(300)
+            })
         return true
     }
 
@@ -373,10 +492,10 @@
 
     function sweepUntilReady(attempt) {
         attempt = attempt || 0
-        if (sweep() && attempt < 40) {
+        if (sweep() && attempt < 120) {
             setTimeout(function () {
                 sweepUntilReady(attempt + 1)
-            }, 150)
+            }, 250)
         }
     }
 
@@ -398,6 +517,14 @@
         })
     }
 
+    function sweepAfterNavigation() {
+        sweepUntilReady()
+        setTimeout(sweepUntilReady, 50)
+        setTimeout(sweepUntilReady, 150)
+        setTimeout(sweepUntilReady, 500)
+        setTimeout(sweepUntilReady, 1000)
+    }
+
     // Instant navigation swaps the page body in after load (sometimes replacing a
     // container we already rendered into with a fresh, empty one). Watch the body and
     // render any container that appears; debounced so Vega's own DOM writes don't churn.
@@ -406,25 +533,57 @@
         var timer
         new MutationObserver(function () {
             clearTimeout(timer)
-            timer = setTimeout(function () {
-                sweepUntilReady()
-            }, 50)
+            timer = setTimeout(sweepAfterNavigation, 50)
         }).observe(document.body, { childList: true, subtree: true })
     }
 
+    function watchLocation() {
+        var href = window.location.href
+        setInterval(function () {
+            if (window.location.href === href) return
+            href = window.location.href
+            sweepAfterNavigation()
+        }, 100)
+    }
+
+    function patchHistory() {
+        ;['pushState', 'replaceState'].forEach(function (name) {
+            var original = window.history && window.history[name]
+            if (!original || original.benchmarkChartsPatched) return
+            var patched = function () {
+                var result = original.apply(this, arguments)
+                sweepAfterNavigation()
+                return result
+            }
+            patched.benchmarkChartsPatched = true
+            window.history[name] = patched
+        })
+    }
+
+    function watchPageReadiness() {
+        window.addEventListener('load', sweepAfterNavigation)
+        window.addEventListener('pageshow', sweepAfterNavigation)
+        window.addEventListener('popstate', sweepAfterNavigation)
+        window.addEventListener('hashchange', sweepAfterNavigation)
+        window.addEventListener('resize', function () {
+            scheduleSweep(100)
+        })
+    }
+
     function start() {
-        sweepUntilReady()
+        patchHistory()
+        sweepAfterNavigation()
         watchTheme()
         watchBody()
+        watchLocation()
+        watchPageReadiness()
     }
 
     // Re-render on each instant navigation, and once for the initial page (covering a
     // document$ first-emission that fired before this script subscribed). renderContainer
     // is keyed per container, so overlapping triggers never double-render.
     if (typeof window.document$ !== 'undefined' && window.document$.subscribe) {
-        window.document$.subscribe(function () {
-            sweepUntilReady()
-        })
+        window.document$.subscribe(sweepAfterNavigation)
     }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', start)
