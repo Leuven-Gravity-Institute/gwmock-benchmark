@@ -137,3 +137,5 @@ node_modules/
 # Generated benchmark figures and table snippets (built from data/ by `aggregate`)
 docs/*/figures/
 docs/*/generated/
+# Generated static JSON API of the dataset (built from data/ by `aggregate`)
+docs/data/

@@ -65,6 +65,7 @@ nav = [
       { "Consistency" = "signal/consistency.md" },
     ] },
   ] },
+  { "Data API" = "data-api.md" },
   { "API" = [
     { "Overview" = "api/index.md" },
     { "Utility" = [

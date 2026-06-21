@@ -4,6 +4,9 @@ Committed benchmark records, one JSON file per data point. The docs site is
 built from these files; contributors add results by opening a pull request that
 drops new files here — **no figures, no edits to the docs.**
 
+These records are also published as a static JSON API under `data/v1/` on the
+docs site (see the **Data API** page) for programmatic retrieval.
+
 ## Layout
 
 ```text
