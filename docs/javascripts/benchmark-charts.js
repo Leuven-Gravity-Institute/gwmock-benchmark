@@ -271,6 +271,9 @@
     // Charts rendered on the page, kept so a palette toggle can re-embed them.
     var rendered = []
     var retryTimer
+    var renderSeq = 0
+    var PENDING_TIMEOUT_MS = 15000
+    var EMBED_TIMEOUT_MS = 20000
     var resizeObserver =
         typeof ResizeObserver === 'undefined'
             ? null
@@ -344,7 +347,7 @@
     }
 
     function chartSvgReady(chart) {
-        var svg = chart.div.querySelector('.vega-embed svg')
+        var svg = chart.div.querySelector('svg')
         if (!svg) return false
         var box = svg.getBoundingClientRect()
         return box.width > 0 && box.height > 0
@@ -362,13 +365,32 @@
                     resolve()
                     return
                 }
-                if (attempt >= 20) {
+                if (attempt >= 120) {
                     reject(new Error('chart rendered with zero size'))
                     return
                 }
                 waitForRenderedCharts(charts, attempt + 1).then(resolve, reject)
             })
         })
+    }
+
+    function withTimeout(promise, ms, message) {
+        var timer
+        var timeout = new Promise(function (_, reject) {
+            timer = setTimeout(function () {
+                reject(new Error(message))
+            }, ms)
+        })
+        return Promise.race([promise, timeout]).then(
+            function (value) {
+                clearTimeout(timer)
+                return value
+            },
+            function (error) {
+                clearTimeout(timer)
+                throw error
+            }
+        )
     }
 
     function embed(chart) {
@@ -409,12 +431,28 @@
         container.dataset.benchmarkObserved = 'true'
     }
 
+    function pendingIsFresh(container) {
+        var started = Number(container.dataset.benchmarkPendingAt || 0)
+        return started && Date.now() - started < PENDING_TIMEOUT_MS
+    }
+
+    function resetContainer(container) {
+        delete container.dataset.benchmarkPending
+        delete container.dataset.benchmarkPendingAt
+        delete container.dataset.benchmarkRendered
+        delete container.dataset.benchmarkRenderId
+        container.innerHTML = ''
+    }
+
     // Render one container's charts, once. Returns false to signal "try again later"
     // when Vega has not loaded yet or the container has no width (layout not settled -
     // a `width: 'container'` spec would otherwise measure 0 and render invisibly).
     function renderContainer(container) {
         if (container.dataset.benchmarkRendered === 'true') return true
-        if (container.dataset.benchmarkPending === 'true') return true
+        if (container.dataset.benchmarkPending === 'true') {
+            if (pendingIsFresh(container)) return true
+            resetContainer(container)
+        }
         observeContainer(container)
         var group = container.getAttribute('data-group')
         var config = SUITES[container.getAttribute('data-suite')]
@@ -432,7 +470,10 @@
         } catch (error) {
             return true
         }
+        var renderId = String(++renderSeq)
         container.dataset.benchmarkPending = 'true'
+        container.dataset.benchmarkPendingAt = String(Date.now())
+        container.dataset.benchmarkRenderId = renderId
         container.innerHTML = ''
         var charts = []
         config.charts.forEach(function (def) {
@@ -444,13 +485,27 @@
         })
         waitForChartTargets(charts)
             .then(function () {
-                return Promise.all(charts.map(embed))
+                return withTimeout(
+                    Promise.all(charts.map(embed)),
+                    EMBED_TIMEOUT_MS,
+                    'chart embedding timed out'
+                )
             })
             .then(function () {
-                return waitForRenderedCharts(charts)
+                return withTimeout(
+                    waitForRenderedCharts(charts),
+                    EMBED_TIMEOUT_MS,
+                    'chart rendered with zero size'
+                )
             })
             .then(function () {
+                if (container.dataset.benchmarkRenderId !== renderId) {
+                    clearCharts(charts)
+                    return
+                }
                 delete container.dataset.benchmarkPending
+                delete container.dataset.benchmarkPendingAt
+                delete container.dataset.benchmarkRenderId
                 if (!container.isConnected) {
                     clearCharts(charts)
                     return
@@ -460,9 +515,9 @@
             })
             .catch(function () {
                 clearCharts(charts)
-                container.innerHTML = ''
-                delete container.dataset.benchmarkPending
-                delete container.dataset.benchmarkRendered
+                if (container.dataset.benchmarkRenderId === renderId) {
+                    resetContainer(container)
+                }
                 scheduleSweep(300)
             })
         return true
@@ -499,6 +554,21 @@
         }
     }
 
+    function hasUnrenderedContainers() {
+        return Array.prototype.some.call(
+            document.querySelectorAll('.benchmark-charts'),
+            function (container) {
+                if (container.dataset.benchmarkRendered === 'true') {
+                    return false
+                }
+                return (
+                    container.dataset.benchmarkPending !== 'true' ||
+                    !pendingIsFresh(container)
+                )
+            }
+        )
+    }
+
     // Re-embed live charts whenever the colour scheme toggles.
     function watchTheme() {
         if (typeof MutationObserver === 'undefined') return
@@ -526,15 +596,28 @@
     }
 
     // Instant navigation swaps the page body in after load (sometimes replacing a
-    // container we already rendered into with a fresh, empty one). Watch the body and
-    // render any container that appears; debounced so Vega's own DOM writes don't churn.
+    // container we already rendered into with a fresh, empty one). Watch the document
+    // root rather than the current body, because instant navigation can replace the
+    // body node after this script has subscribed.
     function watchBody() {
         if (typeof MutationObserver === 'undefined') return
         var timer
         new MutationObserver(function () {
             clearTimeout(timer)
             timer = setTimeout(sweepAfterNavigation, 50)
-        }).observe(document.body, { childList: true, subtree: true })
+        }).observe(document.documentElement || document.body, {
+            childList: true,
+            subtree: true,
+        })
+    }
+
+    // A light safety net for instant navigation: if the URL changed before the new
+    // page fragment arrived, no mutation or document$ callback may line up with the
+    // eventual chart container. Poll only while there is an unrendered chart target.
+    function watchChartArrival() {
+        setInterval(function () {
+            if (hasUnrenderedContainers()) sweepUntilReady()
+        }, 500)
     }
 
     function watchLocation() {
@@ -575,6 +658,7 @@
         sweepAfterNavigation()
         watchTheme()
         watchBody()
+        watchChartArrival()
         watchLocation()
         watchPageReadiness()
     }
