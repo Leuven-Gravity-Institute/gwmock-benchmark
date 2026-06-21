@@ -317,8 +317,25 @@
             .catch(function () {})
     }
 
-    function drawAll() {
-        if (typeof window.vegaEmbed === 'undefined') return
+    // Embed every chart, but only once Vega is loaded AND the containers have a real
+    // width. With instant navigation the page body is swapped in and document$ fires
+    // before layout settles, so a `width: 'container'` spec would measure 0 and render
+    // an invisible chart that only appeared after a manual refresh. Retry on a frame
+    // (bounded) until both hold, then embed.
+    function drawAll(attempt) {
+        attempt = attempt || 0
+        if (!drawn.length) return
+        var ready = typeof window.vegaEmbed !== 'undefined'
+        var sized = drawn.some(function (chart) {
+            return chart.div.getBoundingClientRect().width > 0
+        })
+        if ((!ready || !sized) && attempt < 60) {
+            requestAnimationFrame(function () {
+                drawAll(attempt + 1)
+            })
+            return
+        }
+        if (!ready) return // Vega never arrived; nothing we can do
         drawn.forEach(embed)
     }
 
@@ -338,6 +355,9 @@
             return
         }
 
+        // Idempotent: clear any charts from a previous init so re-running (instant
+        // navigation, or the load-time fallback) never stacks duplicate charts.
+        container.innerHTML = ''
         config.charts.forEach(function (def) {
             var div = document.createElement('div')
             div.className = 'benchmark-chart'
@@ -372,9 +392,16 @@
         watchTheme()
     }
 
+    // Re-run on every instant navigation (document$ emits the swapped-in document).
     if (typeof window.document$ !== 'undefined' && window.document$.subscribe) {
         window.document$.subscribe(init)
-    } else {
+    }
+    // ...and always run once for the initial page, even if document$'s first emission
+    // fired before this script subscribed. init() is idempotent, so a double-run with
+    // the document$ subscription just redraws.
+    if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init)
+    } else {
+        init()
     }
 })()
