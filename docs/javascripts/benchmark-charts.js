@@ -268,9 +268,8 @@
         return groupedSpec(rows, xField, def)
     }
 
-    // Charts drawn on the current page: re-embedded (not just recoloured) when the
-    // light/dark palette toggles, so axes, text, and legends follow the theme.
-    var drawn = []
+    // Charts rendered on the page, kept so a palette toggle can re-embed them.
+    var rendered = []
 
     // Material/zensical sets data-md-color-scheme="slate" on <body> for dark mode.
     // Override only the chrome (text, axes, legend, grid); data colours are shared.
@@ -317,91 +316,119 @@
             .catch(function () {})
     }
 
-    // Embed every chart, but only once Vega is loaded AND the containers have a real
-    // width. With instant navigation the page body is swapped in and document$ fires
-    // before layout settles, so a `width: 'container'` spec would measure 0 and render
-    // an invisible chart that only appeared after a manual refresh. Retry on a frame
-    // (bounded) until both hold, then embed.
-    function drawAll(attempt) {
-        attempt = attempt || 0
-        if (!drawn.length) return
-        var ready = typeof window.vegaEmbed !== 'undefined'
-        var sized = drawn.some(function (chart) {
-            return chart.div.getBoundingClientRect().width > 0
-        })
-        if ((!ready || !sized) && attempt < 60) {
-            requestAnimationFrame(function () {
-                drawAll(attempt + 1)
-            })
-            return
-        }
-        if (!ready) return // Vega never arrived; nothing we can do
-        drawn.forEach(embed)
-    }
-
-    function build(container) {
+    // Render one container's charts, once. Returns false to signal "try again later"
+    // when Vega has not loaded yet or the container has no width (layout not settled —
+    // a `width: 'container'` spec would otherwise measure 0 and render invisibly).
+    function renderContainer(container) {
+        if (container.dataset.benchmarkRendered === 'true') return true
         var group = container.getAttribute('data-group')
-        var suite = container.getAttribute('data-suite')
-        var config = SUITES[suite]
+        var config = SUITES[container.getAttribute('data-suite')]
         var script = document.querySelector(
             'script.benchmark-chart-data[data-group="' + group + '"]'
         )
-        if (!config || !script) return
+        if (!config || !script) return true // nothing renderable here
+        if (typeof window.vegaEmbed === 'undefined') return false
+        if (container.getBoundingClientRect().width === 0) return false
 
         var rows
         try {
             rows = JSON.parse(script.textContent)
         } catch (error) {
-            return
+            return true
         }
-
-        // Idempotent: clear any charts from a previous init so re-running (instant
-        // navigation, or the load-time fallback) never stacks duplicate charts.
         container.innerHTML = ''
         config.charts.forEach(function (def) {
             var div = document.createElement('div')
             div.className = 'benchmark-chart'
             container.appendChild(div)
-            drawn.push({ div: div, spec: specFor(rows, config.xField, def) })
+            var chart = { div: div, spec: specFor(rows, config.xField, def) }
+            rendered.push(chart)
+            embed(chart)
+        })
+        container.dataset.benchmarkRendered = 'true'
+        return true
+    }
+
+    // Drop charts whose container was swapped out (instant navigation), finalizing
+    // their Vega views so they don't leak across navigations.
+    function prune() {
+        rendered = rendered.filter(function (chart) {
+            if (chart.div.isConnected) return true
+            if (chart.view && chart.view.finalize) chart.view.finalize()
+            return false
         })
     }
 
-    // Redraw every chart whenever the body's colour scheme attribute changes.
-    var watching = false
+    // Render every container on the page; returns true if any still needs a retry.
+    function sweep() {
+        prune()
+        var pending = false
+        document
+            .querySelectorAll('.benchmark-charts')
+            .forEach(function (container) {
+                if (!renderContainer(container)) pending = true
+            })
+        return pending
+    }
+
+    function sweepUntilReady(attempt) {
+        attempt = attempt || 0
+        if (sweep() && attempt < 40) {
+            setTimeout(function () {
+                sweepUntilReady(attempt + 1)
+            }, 150)
+        }
+    }
+
+    // Re-embed live charts whenever the colour scheme toggles.
     function watchTheme() {
-        if (watching || typeof MutationObserver === 'undefined') return
-        watching = true
+        if (typeof MutationObserver === 'undefined') return
         new MutationObserver(function (mutations) {
             if (
                 mutations.some(
                     (m) => m.attributeName === 'data-md-color-scheme'
                 )
-            )
-                drawAll()
+            ) {
+                prune()
+                rendered.forEach(embed)
+            }
         }).observe(document.body, {
             attributes: true,
             attributeFilter: ['data-md-color-scheme'],
         })
     }
 
-    function init() {
-        // Instant navigation swaps the DOM, so rebuild from the current page's nodes.
-        drawn = []
-        document.querySelectorAll('.benchmark-charts').forEach(build)
-        drawAll()
-        watchTheme()
+    // Instant navigation swaps the page body in after load (sometimes replacing a
+    // container we already rendered into with a fresh, empty one). Watch the body and
+    // render any container that appears; debounced so Vega's own DOM writes don't churn.
+    function watchBody() {
+        if (typeof MutationObserver === 'undefined') return
+        var timer
+        new MutationObserver(function () {
+            clearTimeout(timer)
+            timer = setTimeout(function () {
+                sweepUntilReady()
+            }, 50)
+        }).observe(document.body, { childList: true, subtree: true })
     }
 
-    // Re-run on every instant navigation (document$ emits the swapped-in document).
-    if (typeof window.document$ !== 'undefined' && window.document$.subscribe) {
-        window.document$.subscribe(init)
+    function start() {
+        sweepUntilReady()
+        watchTheme()
+        watchBody()
     }
-    // ...and always run once for the initial page, even if document$'s first emission
-    // fired before this script subscribed. init() is idempotent, so a double-run with
-    // the document$ subscription just redraws.
+
+    // Re-render on each instant navigation, and once for the initial page (covering a
+    // document$ first-emission that fired before this script subscribed). renderContainer
+    // is keyed per container, so overlapping triggers never double-render.
+    if (typeof window.document$ !== 'undefined' && window.document$.subscribe) {
+        window.document$.subscribe(function () {
+            sweepUntilReady()
+        })
+    }
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init)
+        document.addEventListener('DOMContentLoaded', start)
     } else {
-        init()
+        start()
     }
 })()
