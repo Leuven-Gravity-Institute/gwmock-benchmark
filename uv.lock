@@ -698,7 +698,7 @@ release = [
 
 [package.metadata]
 requires-dist = [
-    { name = "gwmock-signal", extras = ["jax", "pycbc"], marker = "extra == 'signal'", specifier = ">=0.9.1" },
+    { name = "gwmock-signal", extras = ["jax", "pycbc"], marker = "extra == 'signal'", specifier = ">=0.9.2" },
     { name = "typer", specifier = ">=0.26.7" },
 ]
 provides-extras = ["signal"]
