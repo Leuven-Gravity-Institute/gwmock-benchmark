@@ -35,9 +35,7 @@ https://leuven-gravity-institute.github.io/gwmock-benchmark/data/v1/
     "schema_version": 1,
     "generated": "2026-06-21T00:00:00+00:00",
     "count": 19,
-    "records": [
-        /* ... */
-    ]
+    "records": [/* ... */]
 }
 ```
 
