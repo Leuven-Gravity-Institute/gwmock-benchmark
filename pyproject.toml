@@ -21,7 +21,7 @@ classifiers = [
 ]
 requires-python = ">=3.12"
 dynamic = ["version"]
-dependencies = ["typer>=0.26.7"]
+dependencies = ["typer>=0.26.8"]
 
 [project.optional-dependencies]
 # Each benchmarked package is an opt-in extra that pulls the package being measured.
