@@ -39,7 +39,7 @@ jobs:
             contents: read
 
     create_tag:
-        needs: [ci, codeql]
+        needs: [check_new_commits, ci, codeql]
         runs-on: ubuntu-latest
         outputs:
             new_tag: ${{ steps.tag_version.outputs.new_tag }}
@@ -82,7 +82,7 @@ jobs:
                   echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
 
             - name: Output tag information
-              if: ${{ steps.check_commits.outputs.has-changes == 'true' }}
+              if: ${{ needs.check_new_commits.outputs.has-changes == 'true' }}
               run: |
                   echo "### Tag Created :rocket:" >> $GITHUB_STEP_SUMMARY
                   echo "- **New tag**: ${{ steps.tag_version.outputs.new_tag }}" >> $GITHUB_STEP_SUMMARY
@@ -99,7 +99,7 @@ jobs:
             tag_name: ${{ needs.create_tag.outputs.new_tag }}
 
     publish:
-        needs: release
+        needs: [create_tag, release]
         runs-on: ubuntu-latest
         environment:
             name: pypi
