@@ -25,7 +25,7 @@ dependencies = ["typer>=0.26.8"]
 
 [project.optional-dependencies]
 # Each benchmarked package is an opt-in extra that pulls the package being measured.
-signal = ["gwmock-signal[jax,pycbc]>=0.9.3"]
+signal = ["gwmock-signal[jax,pycbc]>=0.9.4"]
 
 [dependency-groups]
 dev = [
