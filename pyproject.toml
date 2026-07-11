@@ -21,11 +21,13 @@ classifiers = [
 ]
 requires-python = ">=3.12"
 dynamic = ["version"]
-dependencies = ["typer>=0.26.8"]
+dependencies = [
+  "typer>=0.19.0", # Literal-type CLI options; the SPEC 0 floor (0.13) predates them
+]
 
 [project.optional-dependencies]
 # Each benchmarked package is an opt-in extra that pulls the package being measured.
-signal = ["gwmock-signal[jax,pycbc]>=0.9.5"]
+signal = ["gwmock-signal[jax,pycbc]>=0.10.0"]
 
 [dependency-groups]
 dev = [
@@ -49,6 +51,12 @@ Source = "https://github.com/Leuven-Gravity-Institute/gwmock-benchmark"
 Tracker = "https://github.com/Leuven-Gravity-Institute/gwmock-benchmark/issues"
 Home = "https://github.com/Leuven-Gravity-Institute/gwmock-benchmark"
 "Release Notes" = "https://github.com/Leuven-Gravity-Institute/gwmock-benchmark/releases"
+
+[tool.dependency-support-policy]
+policy = "spec0"
+groups = ["project", "optional"]
+exclude = ["gwmock-signal"]      # ecosystem sibling: Renovate keeps it at latest
+lock = "minimal"
 
 [tool.hatch.version]
 source = "vcs"
