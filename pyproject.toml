@@ -37,7 +37,7 @@ dev = [
   "pytest>=9.1.1",
 ]
 docs = ["zensical>=0.0.47", "mkdocstrings-python>=2.0.5"]
-build = ["hatch>=1.17.0"]
+build = ["hatch>=1.17.1"]
 release = ["git-cliff>=2.13.1"]
 
 [project.scripts]
