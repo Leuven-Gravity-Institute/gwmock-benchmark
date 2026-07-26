@@ -18,7 +18,7 @@ _DEFAULT_START = 1_126_259_462.0
 
 
 @signal_app.command("performance", no_args_is_help=True)
-def performance(  # noqa: PLR0913
+def performance(  # noqa: PLR0913,PLR0917
     output_json: Annotated[Path, typer.Option("--output-json", "-o", help="Where to write the record.")],
     backend: Annotated[str, typer.Option(help="Waveform backend: lal, pycbc, or ripple.")] = "ripple",
     method: Annotated[str, typer.Option(help="per-event or batched (batched is ripple-only).")] = "batched",
@@ -79,7 +79,7 @@ def performance(  # noqa: PLR0913
 
 
 @signal_app.command("consistency", no_args_is_help=True)
-def consistency(  # noqa: PLR0913 - CLI options map one-to-one to suite knobs
+def consistency(  # noqa: PLR0913,PLR0917 - CLI options map one-to-one to suite knobs
     output_dir: Annotated[Path, typer.Option("--output-dir", "-o", help="Directory for per-approximant records.")],
     sampling_frequency: Annotated[float, typer.Option(help="Sample rate [Hz].")] = 2048.0,
     minimum_frequency: Annotated[float, typer.Option(help="Low-frequency cutoff [Hz].")] = 20.0,
