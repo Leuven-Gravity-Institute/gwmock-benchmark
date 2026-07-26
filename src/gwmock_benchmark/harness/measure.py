@@ -51,7 +51,7 @@ def _gpu_peak_bytes() -> int | None:
         import jax  # noqa: PLC0415 - optional; only present with a GPU stack installed
 
         stats = jax.devices()[0].memory_stats()
-    except Exception:
+    except (ImportError, RuntimeError, IndexError):
         return None
     if not stats:
         return None

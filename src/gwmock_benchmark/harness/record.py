@@ -50,7 +50,7 @@ def make_record(  # noqa: PLR0913 - a record constructor; each field is an expli
 
 
 def validate_record(record: dict) -> None:
-    """Raise :class:`ValueError` if ``record`` is not a well-formed, small record.
+    """Raise :class:`TypeError` (for type violations) or :class:`ValueError` (for content/size violations) if ``record`` is not well-formed.
 
     Enforces the required keys, metrics-only numeric values, scalar/flat-list
     configuration (no nested arrays), and the :data:`MAX_RECORD_BYTES` size cap.
@@ -60,19 +60,19 @@ def validate_record(record: dict) -> None:
         raise ValueError(f"record missing required keys: {missing}")
 
     if not isinstance(record["metrics"], dict):
-        raise ValueError("'metrics' must be a dict")
+        raise TypeError("'metrics' must be a dict")
     for name, value in record["metrics"].items():
         if not isinstance(value, (int, float, type(None))) or isinstance(value, bool):
-            raise ValueError(f"metric {name!r} must be a number or null, got {type(value).__name__}")
+            raise TypeError(f"metric {name!r} must be a number or null, got {type(value).__name__}")
 
     if not isinstance(record["configuration"], dict):
-        raise ValueError("'configuration' must be a dict")
+        raise TypeError("'configuration' must be a dict")
     for name, value in record["configuration"].items():
         if isinstance(value, list):
             if not all(isinstance(item, _SCALAR) for item in value):
-                raise ValueError(f"configuration {name!r} must be a flat list of scalars (no nested arrays)")
+                raise TypeError(f"configuration {name!r} must be a flat list of scalars (no nested arrays)")
         elif not isinstance(value, _SCALAR):
-            raise ValueError(f"configuration {name!r} must be a scalar or a flat list of scalars")
+            raise TypeError(f"configuration {name!r} must be a scalar or a flat list of scalars")
 
     size = len(_serialize(record))
     if size > MAX_RECORD_BYTES:

@@ -21,7 +21,7 @@ class Scheduler(enum.StrEnum):
     htcondor = "htcondor"
 
 
-def submit_command(  # noqa: PLR0913 - resource knobs map one-to-one to scheduler directives
+def submit_command(  # noqa: PLR0913,PLR0917 - resource knobs map one-to-one to scheduler directives
     scheduler: Annotated[Scheduler, typer.Argument(help="Cluster scheduler.")],
     command: Annotated[str, typer.Option("--command", "-c", help="Inner command to run on the node.")],
     output: Annotated[Path, typer.Option("--output", "-o", help="Where to write the submission script.")],

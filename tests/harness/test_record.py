@@ -49,19 +49,19 @@ def test_missing_key_rejected():
 
 def test_non_numeric_metric_rejected():
     """A non-numeric metric value is rejected."""
-    with pytest.raises(ValueError, match="must be a number"):
+    with pytest.raises(TypeError, match="must be a number"):
         validate_record(_record(metrics={"throughput": "fast"}))
 
 
 def test_bool_metric_rejected():
     """A boolean is not accepted as a numeric metric."""
-    with pytest.raises(ValueError, match="must be a number"):
+    with pytest.raises(TypeError, match="must be a number"):
         validate_record(_record(metrics={"ok": True}))
 
 
 def test_nested_array_in_configuration_rejected():
     """A nested array in the configuration is rejected (metrics-only invariant)."""
-    with pytest.raises(ValueError, match="flat list of scalars"):
+    with pytest.raises(TypeError, match="flat list of scalars"):
         validate_record(_record(configuration={"grid": [[1, 2], [3, 4]]}))
 
 
@@ -82,7 +82,7 @@ def test_write_then_load_roundtrip(tmp_path):
 
 def test_write_validates_before_writing(tmp_path):
     """write_record validates first and leaves no file on invalid input."""
-    with pytest.raises(ValueError, match="must be a number"):
+    with pytest.raises(TypeError, match="must be a number"):
         write_record(tmp_path / "bad.json", _record(metrics={"x": "nope"}))
     assert not (tmp_path / "bad.json").exists()
 
