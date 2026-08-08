@@ -714,7 +714,7 @@ release = [
 
 [package.metadata]
 requires-dist = [
-    { name = "gwmock-signal", extras = ["jax", "pycbc"], marker = "extra == 'signal'", specifier = ">=0.11.1" },
+    { name = "gwmock-signal", extras = ["jax", "pycbc"], marker = "extra == 'signal'", specifier = ">=0.15.0" },
     { name = "typer", specifier = ">=0.19.0" },
 ]
 provides-extras = ["signal"]
@@ -737,7 +737,7 @@ release = [{ name = "git-cliff", specifier = ">=2.13.1" }]
 
 [[package]]
 name = "gwmock-signal"
-version = "0.11.1"
+version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "gwpy" },
@@ -745,9 +745,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/10/d0/345a2b963de873271f2da04eda2526133c856aafc8d829a681ce2a0b0012/gwmock_signal-0.11.1.tar.gz", hash = "sha256:59f89b6549ad2122820d14a89ce5d23073222cc1644bb83e67a96be606e097b2", size = 327614, upload-time = "2026-07-21T02:58:28.068Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/94/70/ff393b7129e21a4f4db42b3a39e609d2282e49eaced5fdba075aea259349/gwmock_signal-0.16.0.tar.gz", hash = "sha256:e104115ba1b086c88a2998430b003f82138dcb23f628b5723206b61d78a8b695", size = 468969, upload-time = "2026-08-07T20:33:13.128Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/27/0e/1759b5b55551cf4c455f65a09b4bba9f4f416444e73500e465936e17a821/gwmock_signal-0.11.1-py3-none-any.whl", hash = "sha256:19c0778b6252444ffce3233904321ebaf9ff22c7769d714ea8d6bee124ea63b0", size = 109427, upload-time = "2026-07-21T02:58:26.843Z" },
+    { url = "https://files.pythonhosted.org/packages/df/af/0f1a648601c2cf6148a89b04e65a8561f0ef79e7f38fdc55c9885152cb83/gwmock_signal-0.16.0-py3-none-any.whl", hash = "sha256:a865f75ef7c15273d5f8f3a35aa09c63eb3d1b82fce70944cfeae87ab09a39db", size = 174367, upload-time = "2026-08-07T20:33:11.611Z" },
 ]
 
 [package.optional-dependencies]
@@ -2247,15 +2247,15 @@ wheels = [
 
 [[package]]
 name = "ripplegw"
-version = "0.2.1"
+version = "0.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jax" },
     { name = "jaxtyping" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2e/ec/e6f6a67c5af1f1ba7f227d73377a1b7ef51441c9ee35fb584b2836a0cc58/ripplegw-0.2.1.tar.gz", hash = "sha256:37cd84f30be7a8cf71a6229a1e198d33976ac77c12d79fb06fdbba962e2fd429", size = 473283, upload-time = "2026-06-26T17:48:46.753Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e0/b7/d6da3e3adcd03d5490638a1f73c743e22b9d002ea06c8ebf8c2725905727/ripplegw-0.3.1.tar.gz", hash = "sha256:c9435c9266125b645d38636a42947acad93cf841ce635e55a1a3a5d765990f2e", size = 481899, upload-time = "2026-08-03T20:28:19.215Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d2/7e/e41edb149a71d7b6a978acf7d333ccee9c09d629e5d1f28c125ee8d68eda/ripplegw-0.2.1-py3-none-any.whl", hash = "sha256:d653bcf1158d49d9213df0a646e32f0c842ff1cecf23966da2a96cf3415671e2", size = 184577, upload-time = "2026-06-26T17:48:45.406Z" },
+    { url = "https://files.pythonhosted.org/packages/c9/33/fc079529e3a796da9f4bb1b2cd17a77ba70ff3ae9e821380bdcf46714134/ripplegw-0.3.1-py3-none-any.whl", hash = "sha256:0bd8f1bb8235ae59d9bfa3938ca1ee49bf91f4b38bd313a25620f087539cfeaf", size = 225512, upload-time = "2026-08-03T20:28:17.909Z" },
 ]
 
 [[package]]
