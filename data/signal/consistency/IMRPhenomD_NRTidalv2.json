@@ -7,31 +7,32 @@
     },
     "label": "IMRPhenomD_NRTidalv2",
     "metrics": {
-        "median_overlap": 0.9999999999564773,
-        "min_overlap": 0.9999999999413934
+        "median_overlap": 0.9999999999564685,
+        "min_overlap": 0.9999999999413983
     },
     "package": "gwmock-signal",
     "provenance": {
+        "contributor": null,
         "cpu_model": "Intel(R) N150",
         "gpu_models": [],
-        "gwmock_benchmark_version": "0.1.dev16+ge013a3e8a",
+        "gwmock_benchmark_version": "0.4.5.dev1+ge637fe433",
         "library_versions": {
-            "gwmock-benchmark": "0.1.dev16+ge013a3e8a",
-            "gwmock-signal": "0.9.0",
+            "gwmock-benchmark": "0.4.5.dev1+ge637fe433",
+            "gwmock-signal": "0.16.0",
             "gwpy": "4.0.1",
-            "jax": "0.10.2",
-            "jaxlib": "0.10.2",
+            "jax": "0.11.0",
+            "jaxlib": "0.11.0",
             "lalsuite": "7.26.15",
             "numpy": "2.3.5",
             "pycbc": "2.11.0",
-            "ripplegw": "0.2.0"
+            "ripplegw": "0.3.1"
         },
         "n_cpu_cores": 4,
         "n_gpus": 0,
         "package": "gwmock-signal",
-        "package_version": "0.9.0",
-        "platform": "Linux-6.8.0-111-generic-x86_64-with-glibc2.39",
-        "python_version": "3.14.3"
+        "package_version": "0.16.0",
+        "platform": "Linux-6.8.0-137-generic-x86_64-with-glibc2.39",
+        "python_version": "3.12.3"
     },
     "schema_version": 1,
     "suite": "consistency"
