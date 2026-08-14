@@ -750,7 +750,7 @@ requires-dist = [
 provides-extras = ["signal"]
 
 [package.metadata.requires-dev]
-build = [{ name = "hatch", specifier = ">=1.17.1" }]
+build = [{ name = "hatch", specifier = ">=1.18.0" }]
 dev = [
     { name = "prek", specifier = ">=0.4.13" },
     { name = "pytest", specifier = ">=9.1.1" },
