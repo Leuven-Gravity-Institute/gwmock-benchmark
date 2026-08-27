@@ -28,7 +28,6 @@ import gwsim_benchmark
 
 # How you'd like to use the new feature
 result = gwsim_benchmark.new_function(param="example")
-
 ```
 
 ## 🌈 Use Case & Benefits
