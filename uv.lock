@@ -826,7 +826,7 @@ provides-extras = ["signal"]
 build = [{ name = "hatch", specifier = ">=1.18.0" }]
 dev = [
     { name = "mutmut", specifier = ">=3.7.0" },
-    { name = "prek", specifier = ">=0.5.1" },
+    { name = "prek", specifier = ">=0.5.2" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
     { name = "pytest-github-actions-annotate-failures", specifier = ">=0.4.2" },
