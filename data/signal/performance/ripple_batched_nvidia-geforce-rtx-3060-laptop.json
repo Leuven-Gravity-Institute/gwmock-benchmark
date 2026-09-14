@@ -1,64 +1,58 @@
 {
-  "configuration": {
-    "approximant": "IMRPhenomD",
-    "backend": "ripple",
-    "chunk_size": null,
-    "detectors": [
-      "H1",
-      "L1",
-      "V1"
-    ],
-    "end_time": 1126267654.0,
-    "method": "batched",
-    "minimum_frequency": 20.0,
-    "n_chirp_mass_bins": 1,
-    "n_events": 5000,
-    "sampling_frequency": 4096.0,
-    "segment_duration": 64.0,
-    "start_time": 1126259462.0
-  },
-  "label": "ripple-batched",
-  "metrics": {
-    "average_rss_bytes": 3236697154.6508875,
-    "compile_seconds": 14.394574857000407,
-    "cpu_core_hours_cold": 0.3870974629400007,
-    "cpu_core_hours_warm": 0.33911554674999933,
-    "events_per_second_cold": 43.055478948592246,
-    "events_per_second_warm": 49.14745674858005,
-    "gpu_hours_cold": 0.03225812191166672,
-    "gpu_hours_warm": 0.028259628895833278,
-    "gpu_peak_bytes": 917357312,
-    "output_bytes": 805306368,
-    "peak_rss_bytes": 3236888576,
-    "wall_seconds_cold": 116.12923888200021,
-    "wall_seconds_warm": 101.7346640249998
-  },
-  "package": "gwmock-signal",
-  "provenance": {
-    "contributor": null,
-    "cpu_model": "AMD Ryzen 5 5600H with Radeon Graphics",
-    "gpu_models": [
-      "NVIDIA GeForce RTX 3060 Laptop GPU"
-    ],
-    "gwmock_benchmark_version": "0.5.2",
-    "library_versions": {
-      "gwmock-benchmark": "0.5.2",
-      "gwmock-signal": "0.17.0",
-      "gwpy": "4.0.2",
-      "jax": "0.11.1",
-      "jaxlib": "0.11.1",
-      "lalsuite": "7.26.15",
-      "numpy": "2.5.3",
-      "pycbc": "2.11.0",
-      "ripplegw": "0.4.0"
+    "configuration": {
+        "approximant": "IMRPhenomD",
+        "backend": "ripple",
+        "chunk_size": null,
+        "detectors": ["H1", "L1", "V1"],
+        "end_time": 1126267654.0,
+        "method": "batched",
+        "minimum_frequency": 20.0,
+        "n_chirp_mass_bins": 1,
+        "n_events": 5000,
+        "sampling_frequency": 4096.0,
+        "segment_duration": 64.0,
+        "start_time": 1126259462.0
     },
-    "n_cpu_cores": 12,
-    "n_gpus": 1,
+    "label": "ripple-batched",
+    "metrics": {
+        "average_rss_bytes": 3236697154.6508875,
+        "compile_seconds": 14.394574857000407,
+        "cpu_core_hours_cold": 0.3870974629400007,
+        "cpu_core_hours_warm": 0.33911554674999933,
+        "events_per_second_cold": 43.055478948592246,
+        "events_per_second_warm": 49.14745674858005,
+        "gpu_hours_cold": 0.03225812191166672,
+        "gpu_hours_warm": 0.028259628895833278,
+        "gpu_peak_bytes": 917357312,
+        "output_bytes": 805306368,
+        "peak_rss_bytes": 3236888576,
+        "wall_seconds_cold": 116.12923888200021,
+        "wall_seconds_warm": 101.7346640249998
+    },
     "package": "gwmock-signal",
-    "package_version": "0.17.0",
-    "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
-    "python_version": "3.12.13"
-  },
-  "schema_version": 1,
-  "suite": "performance"
+    "provenance": {
+        "contributor": null,
+        "cpu_model": "AMD Ryzen 5 5600H with Radeon Graphics",
+        "gpu_models": ["NVIDIA GeForce RTX 3060 Laptop GPU"],
+        "gwmock_benchmark_version": "0.5.2",
+        "library_versions": {
+            "gwmock-benchmark": "0.5.2",
+            "gwmock-signal": "0.17.0",
+            "gwpy": "4.0.2",
+            "jax": "0.11.1",
+            "jaxlib": "0.11.1",
+            "lalsuite": "7.26.15",
+            "numpy": "2.5.3",
+            "pycbc": "2.11.0",
+            "ripplegw": "0.4.0"
+        },
+        "n_cpu_cores": 12,
+        "n_gpus": 1,
+        "package": "gwmock-signal",
+        "package_version": "0.17.0",
+        "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+        "python_version": "3.12.13"
+    },
+    "schema_version": 1,
+    "suite": "performance"
 }
