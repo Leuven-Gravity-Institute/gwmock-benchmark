@@ -866,7 +866,7 @@ release = [
 
 [package.metadata]
 requires-dist = [
-    { name = "gwmock-signal", extras = ["jax", "pycbc"], marker = "extra == 'signal'", specifier = ">=0.17.4" },
+    { name = "gwmock-signal", extras = ["jax", "pycbc"], marker = "extra == 'signal'", specifier = ">=0.17.5" },
     { name = "typer", specifier = ">=0.19.0" },
 ]
 provides-extras = ["signal"]
@@ -890,7 +890,7 @@ release = [{ name = "git-cliff", specifier = ">=2.14.2" }]
 
 [[package]]
 name = "gwmock-signal"
-version = "0.17.4"
+version = "0.17.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "gwpy" },
@@ -898,9 +898,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/55/05/88453e4f7d9b26f9a191cb9d88d13ac84ba2cf1ab73112beebce94dbec44/gwmock_signal-0.17.4.tar.gz", hash = "sha256:eac2af4aa014343e12b00d429f458531be33e297b137fc58a24a26eabae7d339", size = 561201, upload-time = "2026-10-06T05:39:45.093Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/97/c0/e523ae3520f69921121de9751059ed16af62a0084da5a1e01c3547143969/gwmock_signal-0.17.5.tar.gz", hash = "sha256:0d3187034eef8f36a9152c90c354f17519a31c7c122421ce7f821170f9e4beff", size = 567085, upload-time = "2026-10-13T06:07:15.104Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a4/f6/0270bd990b3aedda21aad4d8a3838beaec3cfd57a73c71703456a4fc590e/gwmock_signal-0.17.4-py3-none-any.whl", hash = "sha256:0a10547ddd4ca3f3c97f4244944c24524882075a6a6986cbb0c656ee3208817a", size = 184491, upload-time = "2026-10-06T05:39:43.853Z" },
+    { url = "https://files.pythonhosted.org/packages/34/2e/f7b24ebfdbc8f32586fc88876cdc07deac0795a395d25250aa6f19fb0242/gwmock_signal-0.17.5-py3-none-any.whl", hash = "sha256:dca71fe3fb93d4958c684a29034a4ba8e11cbfa7837748c94e97678659abdb19", size = 184490, upload-time = "2026-10-13T06:07:13.644Z" },
 ]
 
 [package.optional-dependencies]
