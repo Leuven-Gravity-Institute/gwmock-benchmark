@@ -35,7 +35,7 @@ dev = [
   "prek>=0.5.5",
   "pytest-github-actions-annotate-failures>=0.4.2",
   "pytest-cov>=7.1.0",
-  "pytest-mock>=3.16.0",
+  "pytest-mock>=3.17.0",
   "pytest>=9.1.1",
   "mutmut>=3.8.0",
 ]
