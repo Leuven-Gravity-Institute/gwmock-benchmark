@@ -32,7 +32,7 @@ signal = ["gwmock-signal[jax,pycbc]>=0.17.5"]
 [dependency-groups]
 dev = [
   "ruff>=0.17.1",
-  "prek>=0.5.5",
+  "prek>=0.5.6",
   "pytest-github-actions-annotate-failures>=0.4.2",
   "pytest-cov>=7.1.0",
   "pytest-mock>=3.17.0",
