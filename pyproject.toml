@@ -27,7 +27,12 @@ dependencies = [
 
 [project.optional-dependencies]
 # Each benchmarked package is an opt-in extra that pulls the package being measured.
-signal = ["gwmock-signal[jax,pycbc]>=0.21.1"]
+# pycbc hard-depends on lalsuite, which has no Python 3.15 wheels yet; gwmock-signal already
+# gates its own lalsuite dependency the same way, so 3.15 gets the ripple backend only.
+signal = [
+  "gwmock-signal[jax]>=0.21.1",
+  "gwmock-signal[pycbc]>=0.21.1; python_version < '3.15'",
+]
 
 [dependency-groups]
 dev = [

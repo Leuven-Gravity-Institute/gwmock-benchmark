@@ -64,7 +64,9 @@ uv pip install "gwmock-benchmark[signal]"   # extra per package you want to benc
 ```
 
 Linux and macOS (the harness uses Unix facilities and the suites pull HPC
-packages such as lalsuite); Python 3.13–3.15.
+packages such as lalsuite); Python 3.13–3.15. lalsuite has no Python 3.15 wheels
+yet, so on 3.15 the `signal` extra installs only the ripple (JAX) backend: the
+`lal` and `pycbc` backends and the consistency suite need 3.13 or 3.14.
 
 ## CLI
 
