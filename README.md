@@ -64,7 +64,7 @@ uv pip install "gwmock-benchmark[signal]"   # extra per package you want to benc
 ```
 
 Linux and macOS (the harness uses Unix facilities and the suites pull HPC
-packages such as lalsuite); Python 3.12–3.14.
+packages such as lalsuite); Python 3.13–3.14.
 
 ## CLI
 
@@ -93,7 +93,7 @@ open a PR).
 ```bash
 git clone git@github.com:Leuven-Gravity-Institute/gwmock-benchmark.git
 cd gwmock-benchmark
-uv venv --python 3.12 && source .venv/bin/activate
+uv venv --python 3.13 && source .venv/bin/activate
 uv sync --group dev --group docs
 uv run prek install
 uv run pytest
