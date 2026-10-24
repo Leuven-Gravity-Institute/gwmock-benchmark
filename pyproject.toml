@@ -15,11 +15,10 @@ classifiers = [
   "Operating System :: POSIX :: Linux",
   "Operating System :: MacOS",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dynamic = ["version"]
 dependencies = [
   "typer>=0.19.0", # Literal-type CLI options; the SPEC 0 floor (0.13) predates them
@@ -157,7 +156,7 @@ commands =
 
 [tool.ruff]
 line-length = 120 # Matches Black's default
-target-version = "py312" # Align with CI (3.12–3.14) and requires-python (>=3.12)
+target-version = "py313" # Align with CI (3.13–3.14) and requires-python (>=3.13)
 lint.extend-select = [
   "E",
   "F",
