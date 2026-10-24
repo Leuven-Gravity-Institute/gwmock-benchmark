@@ -2,7 +2,8 @@ version = 1
 revision = 3
 requires-python = ">=3.13"
 resolution-markers = [
-    "python_full_version >= '3.14'",
+    "python_full_version >= '3.15'",
+    "python_full_version == '3.14.*'",
     "python_full_version < '3.14'",
 ]
 
@@ -730,7 +731,8 @@ dependencies = [
 
 [package.optional-dependencies]
 signal = [
-    { name = "gwmock-signal", extra = ["jax", "pycbc"] },
+    { name = "gwmock-signal", extra = ["jax"] },
+    { name = "gwmock-signal", extra = ["pycbc"], marker = "python_full_version < '3.15'" },
 ]
 
 [package.dev-dependencies]
@@ -756,7 +758,8 @@ release = [
 
 [package.metadata]
 requires-dist = [
-    { name = "gwmock-signal", extras = ["jax", "pycbc"], marker = "extra == 'signal'", specifier = ">=0.21.1" },
+    { name = "gwmock-signal", extras = ["jax"], marker = "extra == 'signal'", specifier = ">=0.21.1" },
+    { name = "gwmock-signal", extras = ["pycbc"], marker = "python_full_version < '3.15' and extra == 'signal'", specifier = ">=0.21.1" },
     { name = "typer", specifier = ">=0.19.0" },
 ]
 provides-extras = ["signal"]

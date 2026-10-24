@@ -17,6 +17,7 @@ classifiers = [
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
 ]
 requires-python = ">=3.13"
 dynamic = ["version"]
@@ -26,7 +27,12 @@ dependencies = [
 
 [project.optional-dependencies]
 # Each benchmarked package is an opt-in extra that pulls the package being measured.
-signal = ["gwmock-signal[jax,pycbc]>=0.21.1"]
+# pycbc hard-depends on lalsuite, which has no Python 3.15 wheels yet; gwmock-signal already
+# gates its own lalsuite dependency the same way, so 3.15 gets the ripple backend only.
+signal = [
+  "gwmock-signal[jax]>=0.21.1",
+  "gwmock-signal[pycbc]>=0.21.1; python_version < '3.15'",
+]
 
 [dependency-groups]
 dev = [
@@ -156,7 +162,7 @@ commands =
 
 [tool.ruff]
 line-length = 120 # Matches Black's default
-target-version = "py313" # Align with CI (3.13–3.14) and requires-python (>=3.13)
+target-version = "py313" # Align with CI (3.13–3.15) and requires-python (>=3.13)
 lint.extend-select = [
   "E",
   "F",
