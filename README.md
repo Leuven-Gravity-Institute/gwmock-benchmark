@@ -64,7 +64,7 @@ uv pip install "gwmock-benchmark[signal]"   # extra per package you want to benc
 ```
 
 Linux and macOS (the harness uses Unix facilities and the suites pull HPC
-packages such as lalsuite); Python 3.13–3.14.
+packages such as lalsuite); Python 3.13–3.15.
 
 ## CLI
 
