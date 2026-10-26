@@ -770,8 +770,8 @@ release = [
 
 [package.metadata]
 requires-dist = [
-    { name = "gwmock-signal", extras = ["jax"], marker = "extra == 'signal'", specifier = ">=0.21.1" },
-    { name = "gwmock-signal", extras = ["pycbc"], marker = "python_full_version < '3.15' and extra == 'signal'", specifier = ">=0.21.1" },
+    { name = "gwmock-signal", extras = ["jax"], marker = "extra == 'signal'", specifier = ">=0.21.2" },
+    { name = "gwmock-signal", extras = ["pycbc"], marker = "python_full_version < '3.15' and extra == 'signal'", specifier = ">=0.21.2" },
     { name = "typer", specifier = ">=0.19.0" },
 ]
 provides-extras = ["signal"]
