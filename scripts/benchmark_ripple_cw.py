@@ -85,20 +85,22 @@ def _gpu_models():
     return [line.strip() for line in completed.stdout.splitlines() if line.strip()]
 
 
-def _weighted_inner(a: np.ndarray, b: np.ndarray, psd: np.ndarray) -> complex:
-    """Two-sided PSD-weighted inner product; common constants cancel in match."""
-    af = np.fft.fft(a, axis=-1)
-    bf = np.fft.fft(b, axis=-1)
-    return np.sum(np.sum(af * np.conjugate(bf), axis=0) / psd)
-
-
 def _weighted_metrics(reference, candidate, weight):
-    aa = float(np.real(_weighted_inner(reference, reference, weight)))
-    bb = float(np.real(_weighted_inner(candidate, candidate, weight)))
-    ab = _weighted_inner(reference, candidate, weight)
+    """One-sided PSD match maximized over a common complex amplitude."""
+    n_samples = reference.shape[-1]
+    af = np.fft.rfft(reference, axis=-1)
+    bf = np.fft.rfft(candidate, axis=-1)
+    factors = np.full(af.shape[-1], 2.0)
+    factors[0] = 1.0
+    if n_samples % 2 == 0:
+        factors[-1] = 1.0
+    weighted = factors / weight
+    aa = float(np.sum(np.sum(np.abs(af) ** 2, axis=0) * weighted))
+    bb = float(np.sum(np.sum(np.abs(bf) ** 2, axis=0) * weighted))
+    ab = np.sum(np.sum(np.conjugate(af) * bf, axis=0) * weighted)
     coeff = ab / aa
-    residual = candidate - coeff * reference
-    rr = float(np.real(_weighted_inner(residual, residual, weight)))
+    residual_f = bf - coeff * af
+    rr = float(np.sum(np.sum(np.abs(residual_f) ** 2, axis=0) * weighted))
     overlap = abs(ab) / math.sqrt(aa * bb)
     # Algebraically equal to 1 - |overlap|, but stable for near-identical data.
     return {
@@ -109,7 +111,7 @@ def _weighted_metrics(reference, candidate, weight):
 
 
 def _etd_mismatch(reference, candidate, sample_rate, psd_path):
-    f = np.abs(np.fft.fftfreq(reference.shape[-1], d=1.0 / sample_rate))
+    f = np.fft.rfftfreq(reference.shape[-1], d=1.0 / sample_rate)
     psd_f, psd_y = np.loadtxt(psd_path, unpack=True)
     psd = np.interp(f, psd_f, psd_y, left=np.inf, right=np.inf)
     return _weighted_metrics(reference, candidate, psd)
@@ -262,7 +264,7 @@ def main():
     combined_metric = _etd_mismatch(ref, got, SAMPLE_RATE, args.psd)
     plus_metric = _etd_mismatch(ref[0:1], got[0:1], SAMPLE_RATE, args.psd)
     cross_metric = _etd_mismatch(ref[1:2], got[1:2], SAMPLE_RATE, args.psd)
-    white_weight = np.ones(n)
+    white_weight = np.ones(n // 2 + 1)
     white_metric = _weighted_metrics(ref, got, white_weight)
 
     # LAL's simulator returns detector-frame strain. Construct its instances
@@ -320,7 +322,7 @@ def main():
     result = {
         "metric": {
             "name": "ET-D PSD-weighted source-polarization mismatch",
-            "definition": "1 - |(hLAL|hripple)| / sqrt((hLAL|hLAL)(hripple|hripple)); both h+ and hx are stacked; two-sided FFT weighted by the mirrored one-sided PSD; rectangular 32 s segment; linear PSD interpolation",
+            "definition": "1 - |(hLAL|hripple)| / sqrt((hLAL|hLAL)(hripple|hripple)); both h+ and hx are stacked; one-sided rFFT weighted by the one-sided PSD with standard DC/Nyquist factors; rectangular 32 s segment; linear PSD interpolation",
             "combined": combined_metric["mismatch"],
             "plus": plus_metric["mismatch"],
             "cross": cross_metric["mismatch"],
@@ -366,7 +368,7 @@ def main():
     ax.scatter(x, vals, s=90, c=["#0072B2", "#E69F00", "#009E73"], zorder=3)
     ax.set_xticks(x, names)
     ax.set_yscale("log")
-    ax.set_ylim(1e-24, 1e-22)
+    ax.set_ylim(max(min(vals) * 0.2, np.finfo(float).tiny), max(vals) * 5.0)
     ax.set_ylabel("ET-D weighted mismatch")
     ax.set_title("LAL reference vs Ripple source polarizations")
     ax.grid(axis="y", which="both", alpha=0.25)

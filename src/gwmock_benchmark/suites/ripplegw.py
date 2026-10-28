@@ -56,14 +56,14 @@ def check_contribution(record: dict) -> list[str]:
 def render(records: list[dict], output_dir: Path) -> list[Path]:
     """Write a compact generated CW benchmark table for the docs site."""
     rows = sorted((r for r in records if r.get("suite") == _SUITE), key=lambda r: r["label"])
-    if not rows:
-        return []
     target = output_dir / "generated" / "continuous-wave-table.md"
     target.parent.mkdir(parents=True, exist_ok=True)
     lines = [
         "| Run | Device | ET-D mismatch | Ripple single (signals/s) | Ripple vmap (signals/s) | LAL single (signals/s) | LAL loop (signals/s) |",
         "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
     ]
+    if not rows:
+        lines.append("| No benchmark records yet. | — | — | — | — | — | — |")
     for record in rows:
         metrics = record["metrics"]
         devices = record["provenance"].get("gpu_models") or []
