@@ -15,6 +15,7 @@ from gwmock_benchmark.harness import make_record, write_record
 
 
 def _cpu_model() -> str:
+    """Return the host CPU model, with a portable fallback."""
     try:
         for line in Path("/proc/cpuinfo").read_text().splitlines():
             if line.startswith("model name"):
@@ -26,6 +27,7 @@ def _cpu_model() -> str:
 
 
 def _benchmark_version() -> str:
+    """Return the installed package version or a source-tree tag."""
     try:
         return version("gwmock-benchmark")
     except PackageNotFoundError:

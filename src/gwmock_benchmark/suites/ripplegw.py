@@ -2,9 +2,23 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 _SUITE = "continuous-wave"
+
+
+def _is_finite_number(value: object) -> bool:
+    """Return whether value is a finite integer or float."""
+    return isinstance(value, (int, float)) and math.isfinite(value)
+
+
+def _rate_matches(rate: object, latency: float, numerator: float) -> bool:
+    """Check whether a recorded rate is the reciprocal of its latency."""
+    if not _is_finite_number(rate):
+        return False
+    expected = numerator / latency
+    return math.isfinite(expected) and abs(rate - expected) <= max(1e-8, 1e-6 * expected)
 
 
 def check_contribution(record: dict) -> list[str]:
@@ -15,6 +29,9 @@ def check_contribution(record: dict) -> list[str]:
     config = record.get("configuration", {})
     metrics = record.get("metrics", {})
     problems: list[str] = []
+    for key, value in metrics.items():
+        if isinstance(value, (int, float)) and not _is_finite_number(value):
+            problems.append(f"metrics.{key} must be finite, got {value!r}")
     batch = config.get("batch_size")
     if not isinstance(batch, int) or batch < 1:
         problems.append(f"configuration.batch_size must be a positive integer, got {batch!r}")
@@ -34,24 +51,18 @@ def check_contribution(record: dict) -> list[str]:
     )
     for latency_key, throughput_key, numerator in pairs:
         latency, throughput = metrics.get(latency_key), metrics.get(throughput_key)
-        if not isinstance(latency, (int, float)) or latency <= 0:
+        if not _is_finite_number(latency) or latency <= 0:
             problems.append(f"metrics.{latency_key} must be positive, got {latency!r}")
-        elif not isinstance(throughput, (int, float)) or abs(throughput - numerator / latency) > max(
-            1e-8, 1e-6 * numerator / latency
-        ):
+        elif not _rate_matches(throughput, latency, numerator):
             problems.append(f"metrics.{throughput_key} disagrees with {latency_key}")
 
     loop_latency, loop_rate = (
         metrics.get("ripple_warm_loop_seconds_per_signal"),
         metrics.get("ripple_warm_loop_signals_per_second"),
     )
-    if not isinstance(loop_latency, (int, float)) or loop_latency <= 0:
+    if not _is_finite_number(loop_latency) or loop_latency <= 0:
         problems.append(f"metrics.ripple_warm_loop_seconds_per_signal must be positive, got {loop_latency!r}")
-    elif (
-        not isinstance(batch, int)
-        or not isinstance(loop_rate, (int, float))
-        or abs(loop_rate - 1.0 / loop_latency) > max(1e-8, 1e-6 / loop_latency)
-    ):
+    elif not isinstance(batch, int) or not _rate_matches(loop_rate, loop_latency, 1.0):
         problems.append("metrics.ripple_warm_loop_signals_per_second disagrees with loop latency")
     return problems
 

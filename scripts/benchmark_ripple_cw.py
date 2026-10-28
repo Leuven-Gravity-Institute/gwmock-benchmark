@@ -53,6 +53,7 @@ DETECTOR = lal.CachedDetectors[lal.LALDetectorIndexLHODIFF]
 
 
 def _sync(tree):
+    """Wait for every JAX leaf in a result tree to finish executing."""
     return jax.tree.map(
         lambda x: x.block_until_ready() if hasattr(x, "block_until_ready") else x,
         tree,
@@ -60,6 +61,7 @@ def _sync(tree):
 
 
 def _cpu_model():
+    """Return the host CPU model, with a portable fallback."""
     try:
         for line in Path("/proc/cpuinfo").read_text().splitlines():
             if line.startswith("model name"):
@@ -71,6 +73,7 @@ def _cpu_model():
 
 
 def _gpu_models():
+    """Return NVIDIA GPU model names when nvidia-smi is available."""
     try:
         completed = subprocess.run(
             ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],  # noqa: S607
@@ -112,6 +115,7 @@ def _weighted_metrics(reference, candidate, weight):
 
 
 def _etd_mismatch(reference, candidate, sample_rate, psd_path):
+    """Compute source-polarization mismatch using the ET-D PSD."""
     f = np.fft.rfftfreq(reference.shape[-1], d=1.0 / sample_rate)
     psd_f, psd_y = np.loadtxt(psd_path, unpack=True)
     psd = np.interp(f, psd_f, psd_y, left=np.inf, right=np.inf)
@@ -119,6 +123,7 @@ def _etd_mismatch(reference, candidate, sample_rate, psd_path):
 
 
 def _lal_source_polarizations(earth_path, sun_path, n):
+    """Generate reference h+ and hx samples with LAL barycentric timing."""
     eph = lalpulsar.InitBarycenter(earth_path, sun_path)
     bi = lalpulsar.BarycenterInput()
     bi.site = DETECTOR
@@ -148,9 +153,11 @@ def _lal_source_polarizations(earth_path, sun_path, n):
 
 
 def _make_lal_simulator(earth_path, sun_path, index=0):
+    """Build a LAL detector-strain simulator for one benchmark source."""
     phi0 = PHI0 + 0.01 * index
 
     def waveform(dt):
+        """Return phase and amplitude parameters at barycentric time dt."""
         return 2.0 * math.pi * (F0 * dt + 0.5 * F1 * dt**2), APLUS, ACROSS
 
     return simulateCW.CWSimulator(
@@ -170,6 +177,7 @@ def _make_lal_simulator(earth_path, sun_path, index=0):
 
 
 def _median_seconds(call, repeats):
+    """Measure synchronized calls and return their median wall time."""
     times = []
     for _ in range(repeats):
         before = time.perf_counter()
@@ -222,6 +230,7 @@ def main():  # noqa: PLR0915
         params = jax.tree.map(lambda x: jax.device_put(x, device), params)
 
         def one(p):
+            """Generate the source-polarization pair for one parameter set."""
             return model(t, p)
 
         one_jit = jax.jit(one)
@@ -237,6 +246,7 @@ def main():  # noqa: PLR0915
         sequential_params = [{k: value[i] for k, value in batch_params.items()} for i in range(batch)]
 
         def sequential():
+            """Generate the benchmark batch through repeated single calls."""
             return [_sync(one_jit(p)) for p in sequential_params]
 
         sequential_s = _median_seconds(sequential, args.repeats)
@@ -287,9 +297,11 @@ def main():  # noqa: PLR0915
         "ripple_jit_python_loop_batch_signals_per_s": args.batch_size / sequential_s,
         "ripple_jit_vmap_warm_signals_per_s": args.batch_size / vmap_warm_s,
     }
-    gpu_models = _gpu_models()
-    if getattr(device, "platform", "") in ("cuda", "gpu") and not gpu_models:
-        gpu_models = [getattr(device, "device_kind", str(device))]
+    gpu_models = []
+    if getattr(device, "platform", "") in ("cuda", "gpu"):
+        gpu_models = _gpu_models()
+        if not gpu_models:
+            gpu_models = [getattr(device, "device_kind", str(device))]
 
     ripple_root = Path(ripplegw.__file__).resolve().parents[2]
     ripple_commit = os.environ.get("RIPPLE_SOURCE_COMMIT")
@@ -343,7 +355,7 @@ def main():  # noqa: PLR0915
         },
         "ephemerides": {"earth": Path(earth_path).name, "sun": Path(sun_path).name},
     }
-    (args.out / "cw-results.json").write_text(json.dumps(result, indent=2) + "\n")
+    (args.out / "cw-results.json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
 
     fig, ax = plt.subplots(figsize=(10, 4.8), layout="constrained")
     names = ["plus", "cross", "combined"]
@@ -420,7 +432,7 @@ def main():  # noqa: PLR0915
     ax.set_xticks(cold_x, cold_labels)
     ax.set_ylabel("First-call latency (ms; log scale)")
     ax.set_yscale("log")
-    ax.set_ylim(0.1, 300)
+    ax.set_ylim(0.1, max(300, float(np.max(cold_ms)) * 1.2))
     ax.set_title("First call: LAL generation vs Ripple compilation + generation")
     ax.grid(axis="y", which="both", alpha=0.25)
     for xpos, value in zip(cold_x, cold_ms, strict=True):

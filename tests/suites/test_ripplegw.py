@@ -63,6 +63,19 @@ def test_check_contribution_rejects_throughput_disagreement():
     assert all("disagrees" in problem for problem in problems)
 
 
+def test_check_contribution_rejects_non_finite_metrics():
+    """Non-finite measured and derived values cannot enter public records."""
+    for key, value in (
+        ("etd_weighted_amplitude_ratio", float("nan")),
+        ("ripple_warm_single_seconds", float("inf")),
+        ("ripple_warm_vmap_signals_per_second", float("nan")),
+    ):
+        record = copy.deepcopy(_record())
+        record["metrics"][key] = value
+        problems = ripplegw.check_contribution(record)
+        assert any(f"metrics.{key} must be finite" in problem for problem in problems)
+
+
 def test_render_writes_populated_and_empty_tables(tmp_path):
     """The report shows device-labelled records and an empty-state row."""
     target = ripplegw.render([_record(), _record("ripple_nvidia-a100.json")], tmp_path)[0]

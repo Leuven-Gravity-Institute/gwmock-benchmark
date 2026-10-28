@@ -87,6 +87,14 @@ def test_write_validates_before_writing(tmp_path):
     assert not (tmp_path / "bad.json").exists()
 
 
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), -float("inf")])
+def test_write_rejects_non_finite_metric_values(tmp_path, value):
+    """JSON output cannot contain JavaScript-style NaN or infinity tokens."""
+    with pytest.raises(ValueError, match="Out of range float values"):
+        write_record(tmp_path / "bad.json", _record(metrics={"x": value}))
+    assert not (tmp_path / "bad.json").exists()
+
+
 def test_written_file_is_sorted_json(tmp_path):
     """Records are written as deterministic, key-sorted JSON for clean diffs."""
     path = write_record(tmp_path / "run.json", _record())

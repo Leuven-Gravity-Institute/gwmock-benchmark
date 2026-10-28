@@ -84,7 +84,7 @@ def validate_record(record: dict) -> None:
 
 def _serialize(record: dict) -> bytes:
     """Return the canonical on-disk JSON bytes for ``record``."""
-    return (json.dumps(record, indent=2, sort_keys=True) + "\n").encode("utf-8")
+    return (json.dumps(record, indent=2, sort_keys=True, allow_nan=False) + "\n").encode("utf-8")
 
 
 def write_record(path: str | Path, record: dict) -> Path:
