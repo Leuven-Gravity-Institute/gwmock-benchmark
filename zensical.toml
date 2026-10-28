@@ -64,6 +64,10 @@ nav = [
       { "Performance" = "signal/performance.md" },
       { "Consistency" = "signal/consistency.md" },
     ] },
+    { "Ripple CW" = [
+      { "Overview" = "ripplegw/index.md" },
+      { "Continuous-wave comparison" = "ripplegw/continuous-wave.md" },
+    ] },
   ] },
   { "Data API" = "data-api.md" },
   { "API" = [
