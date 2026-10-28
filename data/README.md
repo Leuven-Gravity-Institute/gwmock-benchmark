@@ -13,8 +13,10 @@ docs site (see the **Data API** page) for programmatic retrieval.
 data/<package>/<suite>/<name>.json
 ```
 
-- `<package>` — the benchmarked package, e.g. `signal` (gwmock-signal).
-- `<suite>` — `performance` or `consistency`.
+- `<package>` — the benchmarked package, e.g. `signal` (gwmock-signal) or
+  `ripplegw`.
+- `<suite>` — a package-specific benchmark suite, e.g. `performance`,
+  `consistency`, or `continuous-wave`.
 - `<name>` — a descriptive, **cluster-free** name. Performance records are named
   by backend, method, and hardware (e.g. `ripple_batched_nvidia-a30.json`);
   consistency records by approximant (e.g. `IMRPhenomD.json`).

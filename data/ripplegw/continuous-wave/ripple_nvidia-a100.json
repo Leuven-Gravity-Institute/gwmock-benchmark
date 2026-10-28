@@ -1,0 +1,61 @@
+{
+    "configuration": {
+        "barycenter_site": "H1",
+        "batch_size": 16,
+        "benchmark_runner_commit": "35057b0f9a0a6e3033e187ecd51de4c7aa53e258",
+        "comparison_scope": "source polarizations; ET-D is frequency weighting only",
+        "duration_s": 32.0,
+        "f0_hz": 100.0,
+        "f1_hz_s": -1.1e-9,
+        "psd": "ET-D design",
+        "psd_sha256": "92089fb91b5a22aec20a63114da84cf1e494b7507fb7c41e601e070c95792cd6",
+        "psd_source_revision": "0985f75c664786e21cc4f662d4f12fe181b1a536",
+        "ripple_source_commit": "85c76f481c4f0504ec1d74e7ffc34d027e88ab6d",
+        "sample_rate_hz": 256.0,
+        "samples_per_signal": 8192,
+        "warm_repeats_median": 21
+    },
+    "label": "nvidia-a100",
+    "metrics": {
+        "etd_weighted_amplitude_ratio": 1.0000000000000198,
+        "etd_weighted_cross_mismatch": 7.777038417067526e-24,
+        "etd_weighted_mismatch": 7.8663959065108e-24,
+        "etd_weighted_plus_mismatch": 7.900281648518273e-24,
+        "etd_weighted_relative_norm_error": 1.9761969838327786e-14,
+        "lal_warm_loop_seconds_per_signal": 0.00032958193332888186,
+        "lal_warm_loop_signals_per_second": 3034.1468960379093,
+        "lal_warm_seconds_per_signal": 0.00033007003366947174,
+        "lal_warm_signals_per_second": 3029.660066025225,
+        "ripple_cold_single_seconds": 0.7716466420097277,
+        "ripple_cold_vmap_batch_seconds": 0.7628306300612167,
+        "ripple_warm_loop_seconds_per_signal": 0.0002125344326486811,
+        "ripple_warm_loop_signals_per_second": 4705.119954153488,
+        "ripple_warm_single_seconds": 0.00022765097673982382,
+        "ripple_warm_single_signals_per_second": 4392.689257568498,
+        "ripple_warm_vmap_seconds_per_signal": 1.4729375834576786e-5,
+        "ripple_warm_vmap_signals_per_second": 67891.53941286018,
+        "white_time_domain_mismatch": 1.2560067680874529e-23
+    },
+    "package": "ripplegw",
+    "provenance": {
+        "contributor": null,
+        "cpu_model": "AMD EPYC 7302 16-Core Processor",
+        "gpu_models": ["NVIDIA A100-SXM4-80GB"],
+        "gwmock_benchmark_version": "0.5.9.dev22+g958e51c8c",
+        "library_versions": {
+            "jax": "0.11.0",
+            "jaxlib": "0.11.0",
+            "lalsuite": "7.26.15",
+            "numpy": "2.3.5",
+            "ripplegw": "0.5.0.dev39"
+        },
+        "n_cpu_cores": 64,
+        "n_gpus": 1,
+        "package": "ripplegw",
+        "package_version": "0.5.0.dev39",
+        "platform": "Linux-7.2.10-200.fc44.x86_64-x86_64-with-glibc2.43",
+        "python_version": "3.12.13"
+    },
+    "schema_version": 1,
+    "suite": "continuous-wave"
+}

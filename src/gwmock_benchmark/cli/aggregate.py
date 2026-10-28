@@ -80,6 +80,26 @@ def aggregate_command(
             f"{package_dir.name}: {len(records)} records -> {len(written)} artifacts in {docs_dir / package_dir.name}"
         )
 
+    # Package report pages may exist before the first result is contributed.
+    # Render those suites with an empty dataset so their generated includes are
+    # present and the docs site still builds.
+    package_docs_dirs = (
+        sorted(p for p in docs_dir.iterdir() if p.is_dir() and (p / "index.md").is_file()) if docs_dir.is_dir() else []
+    )
+    for package_docs in package_docs_dirs:
+        if package_docs.name in records_by_segment:
+            continue
+        module_name = f"gwmock_benchmark.suites.{package_docs.name}"
+        try:
+            suite = importlib.import_module(module_name)
+        except ModuleNotFoundError as error:
+            if error.name != module_name:
+                raise
+            continue
+        written = suite.render([], package_docs)
+        if written:
+            typer.echo(f"{package_docs.name}: no records -> {len(written)} empty-state artifacts")
+
     if not records_by_segment:
         typer.echo(f"no records found under {data_dir}")
     else:

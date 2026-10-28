@@ -1,0 +1,61 @@
+{
+    "configuration": {
+        "barycenter_site": "H1",
+        "batch_size": 16,
+        "benchmark_runner_commit": "958e51c8c92ea26f467c6acd0d007eb972d4a719",
+        "comparison_scope": "source polarizations; ET-D is frequency weighting only",
+        "duration_s": 32.0,
+        "f0_hz": 100.0,
+        "f1_hz_s": -1.1e-9,
+        "psd": "ET-D design",
+        "psd_sha256": "92089fb91b5a22aec20a63114da84cf1e494b7507fb7c41e601e070c95792cd6",
+        "psd_source_revision": "0985f75c664786e21cc4f662d4f12fe181b1a536",
+        "ripple_source_commit": "85c76f481c4f0504ec1d74e7ffc34d027e88ab6d",
+        "sample_rate_hz": 256.0,
+        "samples_per_signal": 8192,
+        "warm_repeats_median": 21
+    },
+    "label": "cpu",
+    "metrics": {
+        "etd_weighted_amplitude_ratio": 1.0000000000000047,
+        "etd_weighted_cross_mismatch": 1.531726412494635e-23,
+        "etd_weighted_mismatch": 1.5355539092124073e-23,
+        "etd_weighted_plus_mismatch": 1.5369070897495304e-23,
+        "etd_weighted_relative_norm_error": 4.6629367034256575e-15,
+        "lal_warm_loop_seconds_per_signal": 0.00017527525778859854,
+        "lal_warm_loop_signals_per_second": 5705.311819915343,
+        "lal_warm_seconds_per_signal": 0.00017703697085380554,
+        "lal_warm_signals_per_second": 5648.537676493487,
+        "ripple_cold_single_seconds": 0.18069874588400126,
+        "ripple_cold_vmap_batch_seconds": 0.19892460945993662,
+        "ripple_warm_loop_seconds_per_signal": 0.00042902521090582013,
+        "ripple_warm_loop_signals_per_second": 2330.865353783418,
+        "ripple_warm_single_seconds": 0.0004160776734352112,
+        "ripple_warm_single_signals_per_second": 2403.397403527621,
+        "ripple_warm_vmap_seconds_per_signal": 0.00011662510223686695,
+        "ripple_warm_vmap_signals_per_second": 8574.483372961922,
+        "white_time_domain_mismatch": 2.4942227693609307e-23
+    },
+    "package": "ripplegw",
+    "provenance": {
+        "contributor": null,
+        "cpu_model": "AMD Ryzen AI 7 350 w/ Radeon 860M",
+        "gpu_models": [],
+        "gwmock_benchmark_version": "0.5.9.dev22+g958e51c8c",
+        "library_versions": {
+            "jax": "0.11.2",
+            "jaxlib": "0.11.2",
+            "lalsuite": "7.26.16",
+            "numpy": "2.5.4",
+            "ripplegw": "0.5.0.dev39"
+        },
+        "n_cpu_cores": 16,
+        "n_gpus": 0,
+        "package": "ripplegw",
+        "package_version": "0.5.0.dev39",
+        "platform": "Linux-6.8.0-137-generic-x86_64-with-glibc2.39",
+        "python_version": "3.14.7"
+    },
+    "schema_version": 1,
+    "suite": "continuous-wave"
+}

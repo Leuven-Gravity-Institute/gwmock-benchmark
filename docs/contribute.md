@@ -39,6 +39,25 @@ Keep the **settings comparable** to the existing records (same `--n-events`,
 approximant, etc.) so your numbers line up on the charts; vary only the
 hardware.
 
+For Ripple continuous-wave measurements, use a Ripple checkout with its test and
+cross-validation dependencies installed. The runner compares LALPulsar and
+Ripple source polarizations with ET-D frequency weighting and measures single,
+looped-batch, and `vmap` throughput:
+
+```bash
+uv run --project /path/to/ripple --extra cuda --group test --group cross-validation \
+    python /path/to/gwmock-benchmark/scripts/benchmark_ripple_cw.py \
+    --psd /path/to/ripple/tests/psds/ET_D_psd.txt --out /tmp/ripple-cw --device gpu
+uv run python scripts/record_ripple_cw.py /tmp/ripple-cw/cw-results.json \
+    data/ripplegw/continuous-wave/ripple_nvidia-a30.json --label nvidia-a30
+```
+
+For a CPU run, select `--device cpu` and use a hardware-specific output name.
+The mismatch is in source-polarization space: H1 is the LAL barycenter site, and
+ET-D supplies only the frequency weighting. It is not an ET detector or network
+strain result. LAL timing returns detector strain, while Ripple timing returns
+`h+` and `hx`.
+
 Optionally add `--contributor <your-github-handle>` so your handle appears (as a
 link) in the results table — handy if a maintainer has a question about your
 run. It is **voluntary contact metadata**, published with the record on the
