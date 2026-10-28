@@ -48,6 +48,7 @@ PHI0 = 1.1
 PSI = 0.37
 APLUS = 1.0
 ACROSS = 0.64
+NANOSECONDS_PER_SECOND = 1_000_000_000
 DETECTOR = lal.CachedDetectors[lal.LALDetectorIndexLHODIFF]
 
 
@@ -71,7 +72,7 @@ def _cpu_model():
 def _gpu_models():
     try:
         completed = subprocess.run(
-            ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+            ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],  # noqa: S607
             capture_output=True,
             text=True,
             timeout=10,
@@ -132,7 +133,7 @@ def _lal_source_polarizations(earth_path, sun_path, n):
         elapsed = i * dt
         sec = START_GPS + int(elapsed)
         ns = round((elapsed - int(elapsed)) * 1e9)
-        if ns == 1_000_000_000:
+        if ns == NANOSECONDS_PER_SECOND:
             sec, ns = sec + 1, 0
         tgps = lal.LIGOTimeGPS(sec, ns)
         bi.tgps = tgps
@@ -180,7 +181,9 @@ def _median_seconds(call, repeats):
     return statistics.median(times)
 
 
-def main():
+def main():  # noqa: PLR0915
+    """Run the CW validation and throughput benchmark, then save figures."""
+    # This standalone runner keeps orchestration, measurements, and reporting together.
     parser = argparse.ArgumentParser()
     parser.add_argument("--psd", type=Path, required=True, help="ET-D two-column PSD")
     parser.add_argument("--out", type=Path, required=True, help="output directory")
@@ -212,10 +215,7 @@ def main():
     params = {k: jnp.asarray(v, dtype=jnp.float64) for k, v in base.items()}
 
     # Move inputs to the requested backend before starting any timed region.
-    if args.device == "auto":
-        device = jax.devices()[0]
-    else:
-        device = jax.devices(args.device)[0]
+    device = jax.devices()[0] if args.device == "auto" else jax.devices(args.device)[0]
     with jax.default_device(device):
         t = jax.device_put(t, device)
         params = jax.tree.map(lambda x: jax.device_put(x, device), params)
@@ -294,8 +294,8 @@ def main():
     ripple_commit = os.environ.get("RIPPLE_SOURCE_COMMIT")
     if ripple_commit is None:
         try:
-            ripple_commit = subprocess.run(
-                ["git", "-C", str(ripple_root), "rev-parse", "HEAD"],
+            ripple_commit = subprocess.run(  # noqa: S603
+                ["git", "-C", str(ripple_root), "rev-parse", "HEAD"],  # noqa: S607
                 check=True,
                 capture_output=True,
                 text=True,
@@ -355,7 +355,7 @@ def main():
     ax.set_ylabel("ET-D weighted mismatch")
     ax.set_title("LAL reference vs Ripple source polarizations")
     ax.grid(axis="y", which="both", alpha=0.25)
-    for xpos, val in zip(x, vals):
+    for xpos, val in zip(x, vals, strict=True):
         ax.annotate(f"{val:.2e}", (xpos, val), xytext=(0, 5), textcoords="offset points", ha="center", fontsize=9)
     ax.text(
         0.01,
@@ -390,7 +390,7 @@ def main():
     ax.set_ylim(0, max(rates) * 1.18)
     ax.set_title(f"Warm waveform throughput · batch size {args.batch_size}")
     ax.grid(axis="y", which="both", alpha=0.25)
-    for bar, rate in zip(bars, rates):
+    for bar, rate in zip(bars, rates, strict=True):
         ax.annotate(
             f"{rate:.3g}",
             (bar.get_x() + bar.get_width() / 2, bar.get_height()),
@@ -422,7 +422,7 @@ def main():
     ax.set_ylim(0.1, 300)
     ax.set_title("First call: LAL generation vs Ripple compilation + generation")
     ax.grid(axis="y", which="both", alpha=0.25)
-    for xpos, value in zip(cold_x, cold_ms):
+    for xpos, value in zip(cold_x, cold_ms, strict=True):
         ax.annotate(f"{value:.3g}", (xpos, value), xytext=(0, 5), textcoords="offset points", ha="center", fontsize=9)
     ax.text(
         0.01,

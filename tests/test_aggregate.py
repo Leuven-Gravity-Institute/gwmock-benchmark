@@ -16,12 +16,66 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 
 def test_aggregate_renders_signal(tmp_path):
     """Aggregate renders the committed signal data into chart + table snippets."""
+    ripple_docs = tmp_path / "ripplegw"
+    ripple_docs.mkdir()
+    (ripple_docs / "index.md").write_text("# Ripple CW\n")
     result = runner.invoke(app, ["aggregate", "--data-dir", str(_REPO_ROOT / "data"), "--docs-dir", str(tmp_path)])
     assert result.exit_code == 0, result.output
 
     generated = tmp_path / "signal" / "generated"
     for name in ("performance-charts.md", "performance-table.md", "consistency-charts.md", "consistency-table.md"):
         assert (generated / name).exists(), name
+
+
+def test_aggregate_renders_empty_package_page(tmp_path):
+    """Package docs have their generated include even before data is contributed."""
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    docs_dir = tmp_path / "docs"
+    package_docs = docs_dir / "ripplegw"
+    package_docs.mkdir(parents=True)
+    (package_docs / "index.md").write_text("# Ripple CW\n")
+    unknown_docs = docs_dir / "unknown"
+    unknown_docs.mkdir()
+    (unknown_docs / "index.md").write_text("# Unknown package\n")
+
+    result = runner.invoke(
+        app,
+        [
+            "aggregate",
+            "--data-dir",
+            str(data_dir),
+            "--docs-dir",
+            str(docs_dir),
+            "--no-clear-cache",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    generated = package_docs / "generated" / "continuous-wave-table.md"
+    assert "No benchmark records yet" in generated.read_text()
+
+
+def test_aggregate_reraises_missing_suite_dependencies(tmp_path, monkeypatch):
+    """Import failures inside an existing suite are not hidden as missing suites."""
+    import importlib
+
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    docs_dir = tmp_path / "docs"
+    package_docs = docs_dir / "broken"
+    package_docs.mkdir(parents=True)
+    (package_docs / "index.md").write_text("# Broken package\n")
+
+    def fail_import(module_name):
+        raise ModuleNotFoundError("suite dependency missing", name="suite_dependency")
+
+    monkeypatch.setattr(importlib, "import_module", fail_import)
+    result = runner.invoke(
+        app,
+        ["aggregate", "--data-dir", str(data_dir), "--docs-dir", str(docs_dir), "--no-clear-cache"],
+    )
+    assert isinstance(result.exception, ModuleNotFoundError)
+    assert result.exception.name == "suite_dependency"
 
 
 def test_chart_snippet_carries_valid_json_data(tmp_path):

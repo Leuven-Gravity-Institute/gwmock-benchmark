@@ -49,17 +49,21 @@ def test_records_json_is_complete_and_valid(tmp_path):
 
 
 def test_per_suite_splits_partition_the_dataset(tmp_path):
-    """Per-suite files sum to the consolidated count and stay within their suite."""
+    """Every package/suite split sums to the consolidated count."""
     api = _aggregate(tmp_path)
+    manifest = json.loads((api / "index.json").read_text())
     total = json.loads((api / "records.json").read_text())["count"]
 
     split_total = 0
-    for suite in ("performance", "consistency"):
-        payload = json.loads((api / "signal" / f"{suite}.json").read_text())
-        assert payload["count"] == len(payload["records"])
-        assert {r["suite"] for r in payload["records"]} == {suite}
-        assert {r["package"] for r in payload["records"]} == {"gwmock-signal"}
-        split_total += payload["count"]
+    for package in manifest["packages"]:
+        package_name = package["package"]
+        for suite in package["suites"]:
+            suite_name = suite["suite"]
+            payload = json.loads((api / package_name / f"{suite_name}.json").read_text())
+            assert payload["count"] == len(payload["records"])
+            assert {r["suite"] for r in payload["records"]} == {suite_name}
+            assert {r["package"] for r in payload["records"]} == set(package["distributions"])
+            split_total += payload["count"]
     assert split_total == total
 
 
@@ -106,4 +110,6 @@ def test_site_url_override_controls_link_style(tmp_path):
     manifest_rel = json.loads((api_rel / "index.json").read_text())
     assert manifest_rel["site_url"] is None
     assert manifest_rel["links"]["records"] == "records.json"
-    assert manifest_rel["packages"][0]["suites"][0]["url"] == "signal/consistency.json"
+    signal_package = next(package for package in manifest_rel["packages"] if package["package"] == "signal")
+    consistency_suite = next(suite for suite in signal_package["suites"] if suite["suite"] == "consistency")
+    assert consistency_suite["url"] == "signal/consistency.json"

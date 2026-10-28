@@ -30,8 +30,8 @@ def _benchmark_version() -> str:
     except PackageNotFoundError:
         root = Path(__file__).resolve().parents[1]
         try:
-            return subprocess.run(
-                ["git", "-C", str(root), "describe", "--tags", "--always"],
+            return subprocess.run(  # noqa: S603
+                ["git", "-C", str(root), "describe", "--tags", "--always"],  # noqa: S607
                 check=True,
                 capture_output=True,
                 text=True,
@@ -44,8 +44,8 @@ def _benchmark_commit() -> str:
     """Return the source revision containing this runner, if available."""
     root = Path(__file__).resolve().parents[1]
     try:
-        return subprocess.run(
-            ["git", "-C", str(root), "rev-parse", "HEAD"],
+        return subprocess.run(  # noqa: S603
+            ["git", "-C", str(root), "rev-parse", "HEAD"],  # noqa: S607
             check=True,
             capture_output=True,
             text=True,
@@ -131,6 +131,7 @@ def build_record(raw: dict, label: str) -> dict:
 
 
 def main() -> None:
+    """Convert the raw benchmark JSON into a validated public record."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input", type=Path, help="Raw JSON written by cw_compare.py")
     parser.add_argument("output", type=Path, help="Destination metrics-only record")
