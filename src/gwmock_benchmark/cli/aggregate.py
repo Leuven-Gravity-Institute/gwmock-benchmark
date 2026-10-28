@@ -84,9 +84,7 @@ def aggregate_command(
     # Render those suites with an empty dataset so their generated includes are
     # present and the docs site still builds.
     package_docs_dirs = (
-        sorted(p for p in docs_dir.iterdir() if p.is_dir() and (p / "index.md").is_file())
-        if docs_dir.is_dir()
-        else []
+        sorted(p for p in docs_dir.iterdir() if p.is_dir() and (p / "index.md").is_file()) if docs_dir.is_dir() else []
     )
     for package_docs in package_docs_dirs:
         if package_docs.name in records_by_segment:

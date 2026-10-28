@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-from importlib.metadata import version
 import json
 import math
 import os
@@ -22,6 +21,7 @@ import platform
 import statistics
 import subprocess
 import time
+from importlib.metadata import version
 from pathlib import Path
 
 import jax
@@ -30,11 +30,10 @@ import lal
 import lalpulsar
 import matplotlib.pyplot as plt
 import numpy as np
-from lalpulsar import simulateCW
 import ripplegw
-
-from ripplegw.waveforms.cw.PulsarSignal import PulsarSignal
+from lalpulsar import simulateCW
 from ripplegw.waveforms.cw.ephemeris import resolve_ephemeris_path
+from ripplegw.waveforms.cw.PulsarSignal import PulsarSignal
 
 jax.config.update("jax_enable_x64", True)
 
@@ -191,17 +190,12 @@ def main():
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
 
-    earth_path = resolve_ephemeris_path(
-        os.environ.get("RIPPLE_EARTH_EPHEMERIS", "earth00-40-DE405.dat.gz")
-    )
-    sun_path = resolve_ephemeris_path(
-        os.environ.get("RIPPLE_SUN_EPHEMERIS", "sun00-40-DE405.dat.gz")
-    )
+    earth_path = resolve_ephemeris_path(os.environ.get("RIPPLE_EARTH_EPHEMERIS", "earth00-40-DE405.dat.gz"))
+    sun_path = resolve_ephemeris_path(os.environ.get("RIPPLE_SUN_EPHEMERIS", "sun00-40-DE405.dat.gz"))
     n = int(DURATION * SAMPLE_RATE)
     dt = 1.0 / SAMPLE_RATE
     t = jnp.arange(n, dtype=jnp.float64) * dt
-    model = PulsarSignal(earth_path, sun_path, START_GPS, n_spindowns=1,
-                         ref_time_ssb=float(START_GPS))
+    model = PulsarSignal(earth_path, sun_path, START_GPS, n_spindowns=1, ref_time_ssb=float(START_GPS))
     site = DETECTOR.location
     base = {
         "alpha": ALPHA,
@@ -236,17 +230,10 @@ def main():
         single_warm_s = _median_seconds(lambda: one_jit(params), args.repeats)
 
         batch = args.batch_size
-        batch_params_np = {
-            k: np.full(batch, float(v), dtype=np.float64) for k, v in base.items()
-        }
+        batch_params_np = {k: np.full(batch, float(v), dtype=np.float64) for k, v in base.items()}
         batch_params_np["phi0"] = PHI0 + np.arange(batch) * 0.01
-        batch_params = {
-            k: jax.device_put(jnp.asarray(v), device)
-            for k, v in batch_params_np.items()
-        }
-        sequential_params = [
-            {k: value[i] for k, value in batch_params.items()} for i in range(batch)
-        ]
+        batch_params = {k: jax.device_put(jnp.asarray(v), device) for k, v in batch_params_np.items()}
+        sequential_params = [{k: value[i] for k, value in batch_params.items()} for i in range(batch)]
 
         def sequential():
             return [_sync(one_jit(p)) for p in sequential_params]
@@ -274,12 +261,8 @@ def main():
     lal_cold_output = lal_one.get_strain(SAMPLE_RATE)[1]
     lal_first_s = time.perf_counter() - begin
     lal_warm_s = _median_seconds(lambda: lal_one.get_strain(SAMPLE_RATE), args.repeats)
-    lal_batch = [
-        _make_lal_simulator(earth_path, sun_path, i) for i in range(args.batch_size)
-    ]
-    lal_loop_s = _median_seconds(
-        lambda: [sim.get_strain(SAMPLE_RATE) for sim in lal_batch], args.repeats
-    )
+    lal_batch = [_make_lal_simulator(earth_path, sun_path, i) for i in range(args.batch_size)]
+    lal_loop_s = _median_seconds(lambda: [sim.get_strain(SAMPLE_RATE) for sim in lal_batch], args.repeats)
 
     timings = {
         "duration_s": DURATION,
@@ -373,10 +356,15 @@ def main():
     ax.set_title("LAL reference vs Ripple source polarizations")
     ax.grid(axis="y", which="both", alpha=0.25)
     for xpos, val in zip(x, vals):
-        ax.annotate(f"{val:.2e}", (xpos, val),
-                    xytext=(0, 5), textcoords="offset points", ha="center", fontsize=9)
-    ax.text(0.01, -0.2, "32 s · 256 Hz · f₀ = 100 Hz · ET-D PSD · source polarizations",
-            transform=ax.transAxes, fontsize=9, color="#4b5563")
+        ax.annotate(f"{val:.2e}", (xpos, val), xytext=(0, 5), textcoords="offset points", ha="center", fontsize=9)
+    ax.text(
+        0.01,
+        -0.2,
+        "32 s · 256 Hz · f₀ = 100 Hz · ET-D PSD · source polarizations",
+        transform=ax.transAxes,
+        fontsize=9,
+        color="#4b5563",
+    )
     fig.savefig(args.out / "cw-etd-mismatch.png", dpi=180, facecolor="white")
     plt.close(fig)
 
@@ -397,18 +385,28 @@ def main():
     fig, ax = plt.subplots(figsize=(11, 4.8), layout="constrained")
     colors = ["#666666", "#666666", "#0072B2", "#0072B2", "#009E73"]
     rates = 1.0 / np.asarray(values)
-    bars = ax.bar(labels, rates, color=colors,
-                  hatch=["///", "\\\\", "///", "\\\\", ""])
+    bars = ax.bar(labels, rates, color=colors, hatch=["///", "\\\\", "///", "\\\\", ""])
     ax.set_ylabel("Signals per second")
     ax.set_ylim(0, max(rates) * 1.18)
     ax.set_title(f"Warm waveform throughput · batch size {args.batch_size}")
     ax.grid(axis="y", which="both", alpha=0.25)
     for bar, rate in zip(bars, rates):
-        ax.annotate(f"{rate:.3g}", (bar.get_x() + bar.get_width()/2, bar.get_height()),
-                    xytext=(0, 5), textcoords="offset points", ha="center", fontsize=9)
-    ax.text(0.01, -0.23,
-            "LAL: detector strain; Ripple: h+, hx. Warm timings exclude setup; ≠ identical output payload.",
-            transform=ax.transAxes, fontsize=8.5, color="#4b5563")
+        ax.annotate(
+            f"{rate:.3g}",
+            (bar.get_x() + bar.get_width() / 2, bar.get_height()),
+            xytext=(0, 5),
+            textcoords="offset points",
+            ha="center",
+            fontsize=9,
+        )
+    ax.text(
+        0.01,
+        -0.23,
+        "LAL: detector strain; Ripple: h+, hx. Warm timings exclude setup; ≠ identical output payload.",
+        transform=ax.transAxes,
+        fontsize=8.5,
+        color="#4b5563",
+    )
     fig.savefig(args.out / "cw-throughput.png", dpi=180, facecolor="white")
     plt.close(fig)
 
@@ -425,11 +423,15 @@ def main():
     ax.set_title("First call: LAL generation vs Ripple compilation + generation")
     ax.grid(axis="y", which="both", alpha=0.25)
     for xpos, value in zip(cold_x, cold_ms):
-        ax.annotate(f"{value:.3g}", (xpos, value),
-                    xytext=(0, 5), textcoords="offset points", ha="center", fontsize=9)
-    ax.text(0.01, -0.2,
-            f"LAL object prebuilt; vmapped bar is one batch of {args.batch_size}; JAX bars include compile.",
-            transform=ax.transAxes, fontsize=8.5, color="#4b5563")
+        ax.annotate(f"{value:.3g}", (xpos, value), xytext=(0, 5), textcoords="offset points", ha="center", fontsize=9)
+    ax.text(
+        0.01,
+        -0.2,
+        f"LAL object prebuilt; vmapped bar is one batch of {args.batch_size}; JAX bars include compile.",
+        transform=ax.transAxes,
+        fontsize=8.5,
+        color="#4b5563",
+    )
     fig.savefig(args.out / "cw-cold-start.png", dpi=180, facecolor="white")
     plt.close(fig)
 

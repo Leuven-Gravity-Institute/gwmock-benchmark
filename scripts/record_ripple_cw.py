@@ -114,30 +114,17 @@ def build_record(raw: dict, label: str) -> dict:
             "etd_weighted_relative_norm_error": metric["combined_relative_norm_error"],
             "white_time_domain_mismatch": metric["white_time_domain_mismatch"],
             "ripple_cold_single_seconds": timing["ripple_jit_cold_single_s"],
-            "ripple_cold_vmap_batch_seconds": timing["ripple_jit_vmap_cold_per_signal_s"]
-            * timing["batch_size"],
+            "ripple_cold_vmap_batch_seconds": timing["ripple_jit_vmap_cold_per_signal_s"] * timing["batch_size"],
             "ripple_warm_single_seconds": timing["ripple_jit_warm_single_s"],
             "ripple_warm_single_signals_per_second": rates["ripple_jit_warm_single_signals_per_s"],
-            "ripple_warm_loop_seconds_per_signal": timing[
-                "ripple_jit_python_loop_batch_per_signal_s"
-            ],
-            "ripple_warm_loop_signals_per_second": rates[
-                "ripple_jit_python_loop_batch_signals_per_s"
-            ],
-            "ripple_warm_vmap_seconds_per_signal": timing[
-                "ripple_jit_vmap_warm_per_signal_s"
-            ],
-            "ripple_warm_vmap_signals_per_second": rates[
-                "ripple_jit_vmap_warm_signals_per_s"
-            ],
+            "ripple_warm_loop_seconds_per_signal": timing["ripple_jit_python_loop_batch_per_signal_s"],
+            "ripple_warm_loop_signals_per_second": rates["ripple_jit_python_loop_batch_signals_per_s"],
+            "ripple_warm_vmap_seconds_per_signal": timing["ripple_jit_vmap_warm_per_signal_s"],
+            "ripple_warm_vmap_signals_per_second": rates["ripple_jit_vmap_warm_signals_per_s"],
             "lal_warm_seconds_per_signal": timing["lal_warm_single_s"],
             "lal_warm_signals_per_second": rates["lal_warm_single_signals_per_s"],
-            "lal_warm_loop_seconds_per_signal": timing[
-                "lal_python_loop_batch_per_signal_s"
-            ],
-            "lal_warm_loop_signals_per_second": rates[
-                "lal_python_loop_batch_signals_per_s"
-            ],
+            "lal_warm_loop_seconds_per_signal": timing["lal_python_loop_batch_per_signal_s"],
+            "lal_warm_loop_signals_per_second": rates["lal_python_loop_batch_signals_per_s"],
         },
         provenance=provenance,
     )

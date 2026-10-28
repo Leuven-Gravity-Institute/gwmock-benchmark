@@ -41,14 +41,17 @@ def check_contribution(record: dict) -> list[str]:
         ):
             problems.append(f"metrics.{throughput_key} disagrees with {latency_key}")
 
-    loop_latency, loop_rate = metrics.get("ripple_warm_loop_seconds_per_signal"), metrics.get(
-        "ripple_warm_loop_signals_per_second"
+    loop_latency, loop_rate = (
+        metrics.get("ripple_warm_loop_seconds_per_signal"),
+        metrics.get("ripple_warm_loop_signals_per_second"),
     )
     if not isinstance(loop_latency, (int, float)) or loop_latency <= 0:
         problems.append(f"metrics.ripple_warm_loop_seconds_per_signal must be positive, got {loop_latency!r}")
-    elif not isinstance(batch, int) or not isinstance(loop_rate, (int, float)) or abs(
-        loop_rate - 1.0 / loop_latency
-    ) > max(1e-8, 1e-6 / loop_latency):
+    elif (
+        not isinstance(batch, int)
+        or not isinstance(loop_rate, (int, float))
+        or abs(loop_rate - 1.0 / loop_latency) > max(1e-8, 1e-6 / loop_latency)
+    ):
         problems.append("metrics.ripple_warm_loop_signals_per_second disagrees with loop latency")
     return problems
 

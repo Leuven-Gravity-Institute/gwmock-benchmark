@@ -50,9 +50,9 @@ page for the endpoints, the record schema, and `curl`/Python examples.
 
 ## Benchmarked packages
 
-| Package                                                                    | Suites                                | Extra                        |
-| -------------------------------------------------------------------------- | ------------------------------------- | ---------------------------- |
-| [gwmock-signal](https://github.com/Leuven-Gravity-Institute/gwmock-signal) | performance, consistency              | `gwmock-benchmark[signal]`   |
+| Package                                                                    | Suites                               | Extra                       |
+| -------------------------------------------------------------------------- | ------------------------------------ | --------------------------- |
+| [gwmock-signal](https://github.com/Leuven-Gravity-Institute/gwmock-signal) | performance, consistency             | `gwmock-benchmark[signal]`  |
 | [Ripple](https://github.com/GW-JAX-Team/ripple)                            | continuous-wave source polarizations | Ripple checkout environment |
 
 More packages (`gwmock-pop`, `gwmock-noise`, `gwmock`) plug in as suites under
