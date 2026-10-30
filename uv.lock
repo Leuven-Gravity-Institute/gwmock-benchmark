@@ -770,8 +770,8 @@ release = [
 
 [package.metadata]
 requires-dist = [
-    { name = "gwmock-signal", extras = ["jax"], marker = "extra == 'signal'", specifier = ">=0.21.2" },
-    { name = "gwmock-signal", extras = ["pycbc"], marker = "python_full_version < '3.15' and extra == 'signal'", specifier = ">=0.21.2" },
+    { name = "gwmock-signal", extras = ["jax"], marker = "extra == 'signal'", specifier = ">=0.21.3" },
+    { name = "gwmock-signal", extras = ["pycbc"], marker = "python_full_version < '3.15' and extra == 'signal'", specifier = ">=0.21.3" },
     { name = "typer", specifier = ">=0.19.0" },
 ]
 provides-extras = ["signal"]
@@ -795,21 +795,21 @@ release = [{ name = "git-cliff", specifier = ">=2.14.2" }]
 
 [[package]]
 name = "gwmock-data"
-version = "0.4.3"
+version = "0.4.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "astropy" },
     { name = "numpy" },
     { name = "pyfive" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5c/33/17d16dafbc8d04dd88b04fca1fcf8261dd152d884b073749e05cb907eb15/gwmock_data-0.4.3.tar.gz", hash = "sha256:6389437f34766bb0c4940d8a88d845adac57cbfba39921a6b439c8748ce94d8c", size = 286545, upload-time = "2026-10-23T21:41:38.918Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ae/b3/5623ffed236d4638eb02914dcd272ad873b19c66f685968d9668eaef0d3c/gwmock_data-0.4.5.tar.gz", hash = "sha256:c66ea15724af20c523cde071b58966a2f92dd208de0980c581c24ba833dd3ab3", size = 292407, upload-time = "2026-10-28T12:38:39.373Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2e/0e/e65bff47291ea3e6ad882964896d788d17b9c80cf5b437deed103b7be99d/gwmock_data-0.4.3-py3-none-any.whl", hash = "sha256:c350e65405042dddf7e1d8423ea60311171e1cea3590426b34fbffd498d5b254", size = 52022, upload-time = "2026-10-23T21:41:37.954Z" },
+    { url = "https://files.pythonhosted.org/packages/27/41/1261e68200acc08f3e5f28268d478619b500c16a6c68bc4fa407d376a07a/gwmock_data-0.4.5-py3-none-any.whl", hash = "sha256:b5315fee229db821e6502af2878926c5bed803a4da71f00443b98212b0101fc3", size = 53103, upload-time = "2026-10-28T12:38:38.355Z" },
 ]
 
 [[package]]
 name = "gwmock-signal"
-version = "0.21.2"
+version = "0.21.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "astropy" },
@@ -819,9 +819,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/06/1a/4491b546e0fd6ce52523f6dbd09d36df59a308318684357d7d71827074f9/gwmock_signal-0.21.2.tar.gz", hash = "sha256:2fd12751fbaeca3c2aa20c4502daf0287aab43870e01125cae97411e5fcc0272", size = 651368, upload-time = "2026-10-23T02:41:04.754Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4a/06/61744d31478d4203de34e9921df80faba34ffdb55de66499870103101dea/gwmock_signal-0.21.4.tar.gz", hash = "sha256:c898dba56103369535909c2fc04d1bfaeb0814d8fcb5941bae25a4004e62caad", size = 657575, upload-time = "2026-10-28T17:09:46.088Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/68/a4/95a88c5446798b08232e5ecb4612e0301f9ed6c6a22c88762387673a7763/gwmock_signal-0.21.2-py3-none-any.whl", hash = "sha256:23dd720c6b70b0e897edf9286419cd61cce1f065642bbb891e39289ee839f5fb", size = 216073, upload-time = "2026-10-23T02:41:03.314Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/c6/658032f31b20bf2c72e6562348387287387d2a9cb246a0a600c9322e89e5/gwmock_signal-0.21.4-py3-none-any.whl", hash = "sha256:33816af90b461546583bf6349ba24d556b3f6f7d164ee5f2fadc85405db08e59", size = 217001, upload-time = "2026-10-28T17:09:44.634Z" },
 ]
 
 [package.optional-dependencies]

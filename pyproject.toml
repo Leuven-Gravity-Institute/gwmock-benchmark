@@ -30,8 +30,8 @@ dependencies = [
 # pycbc hard-depends on lalsuite, which has no Python 3.15 wheels yet; gwmock-signal already
 # gates its own lalsuite dependency the same way, so 3.15 gets the ripple backend only.
 signal = [
-  "gwmock-signal[jax]>=0.21.2",
-  "gwmock-signal[pycbc]>=0.21.2; python_version < '3.15'",
+  "gwmock-signal[jax]>=0.21.3",
+  "gwmock-signal[pycbc]>=0.21.3; python_version < '3.15'",
 ]
 
 [dependency-groups]
