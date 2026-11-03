@@ -775,8 +775,8 @@ release = [
 
 [package.metadata]
 requires-dist = [
-    { name = "gwmock-signal", extras = ["jax"], marker = "extra == 'signal'", specifier = ">=0.21.4" },
-    { name = "gwmock-signal", extras = ["pycbc"], marker = "python_full_version < '3.15' and extra == 'signal'", specifier = ">=0.21.4" },
+    { name = "gwmock-signal", extras = ["jax"], marker = "extra == 'signal'", specifier = ">=0.21.5" },
+    { name = "gwmock-signal", extras = ["pycbc"], marker = "python_full_version < '3.15' and extra == 'signal'", specifier = ">=0.21.5" },
     { name = "typer", specifier = ">=0.19.0" },
 ]
 provides-extras = ["signal"]
@@ -814,19 +814,19 @@ wheels = [
 
 [[package]]
 name = "gwmock-signal"
-version = "0.21.5"
+version = "0.21.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "astropy" },
     { name = "gwmock-data" },
-    { name = "lalsuite", marker = "python_full_version < '3.15'" },
+    { name = "lalsuite" },
     { name = "numpy" },
     { name = "pyyaml" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fb/e0/082ae65bda6eb12af338570211678d9484bd24813a387d75f6ae19c840a9/gwmock_signal-0.21.5.tar.gz", hash = "sha256:767edb0554bbc8e5c56663febb55ecca28868af6c2ead05c5ad945abefe1528d", size = 667412, upload-time = "2026-10-31T11:24:55.815Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/10/7e/14072a4c0365891536f5789a50f183af78873d7926806d6726540304043d/gwmock_signal-0.21.6.tar.gz", hash = "sha256:8b7f9521c1ba24a7f4219d45e1e2dcf25df28328209e4dab6f97ffd434818598", size = 670988, upload-time = "2026-11-03T06:10:30.204Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1a/17/6f0a7816c1708d8e24624cf646f68b2a69b30e8c1afa4406e3e48a0d86f5/gwmock_signal-0.21.5-py3-none-any.whl", hash = "sha256:a92800ccc5258b93344d64585e3dcf5d3bcf55080665c7b1657b9ffe850c0d1f", size = 222009, upload-time = "2026-10-31T11:24:54.651Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/e2/8501a33dbdd294ba144bde4245853e08d0c585522a1f10f82c190b32b9a2/gwmock_signal-0.21.6-py3-none-any.whl", hash = "sha256:2bbba2ef397f5812a6196abb85a252545f813d19b4a7519871a29995a0b9f3a8", size = 221988, upload-time = "2026-11-03T06:10:28.199Z" },
 ]
 
 [package.optional-dependencies]
