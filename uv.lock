@@ -775,8 +775,8 @@ release = [
 
 [package.metadata]
 requires-dist = [
-    { name = "gwmock-signal", extras = ["jax"], marker = "extra == 'signal'", specifier = ">=0.21.5" },
-    { name = "gwmock-signal", extras = ["pycbc"], marker = "python_full_version < '3.15' and extra == 'signal'", specifier = ">=0.21.5" },
+    { name = "gwmock-signal", extras = ["jax"], marker = "extra == 'signal'", specifier = ">=0.21.6" },
+    { name = "gwmock-signal", extras = ["pycbc"], marker = "python_full_version < '3.15' and extra == 'signal'", specifier = ">=0.21.6" },
     { name = "typer", specifier = ">=0.19.0" },
 ]
 provides-extras = ["signal"]
@@ -814,7 +814,7 @@ wheels = [
 
 [[package]]
 name = "gwmock-signal"
-version = "0.21.6"
+version = "0.22.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "astropy" },
@@ -824,9 +824,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/10/7e/14072a4c0365891536f5789a50f183af78873d7926806d6726540304043d/gwmock_signal-0.21.6.tar.gz", hash = "sha256:8b7f9521c1ba24a7f4219d45e1e2dcf25df28328209e4dab6f97ffd434818598", size = 670988, upload-time = "2026-11-03T06:10:30.204Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ad/2a/bec1d9059a5dafb24840c88debc8e42bf959bb942973955e019d1512da1f/gwmock_signal-0.22.0.tar.gz", hash = "sha256:aecae6c0df9baf763d67a8b01317535f5b9815d164c881537ed25460231deba3", size = 715080, upload-time = "2026-11-05T10:23:59.865Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4e/e2/8501a33dbdd294ba144bde4245853e08d0c585522a1f10f82c190b32b9a2/gwmock_signal-0.21.6-py3-none-any.whl", hash = "sha256:2bbba2ef397f5812a6196abb85a252545f813d19b4a7519871a29995a0b9f3a8", size = 221988, upload-time = "2026-11-03T06:10:28.199Z" },
+    { url = "https://files.pythonhosted.org/packages/3f/de/67be5154c45c2386f9736906a07f5aa95c1108da1ec344e87e68927de08b/gwmock_signal-0.22.0-py3-none-any.whl", hash = "sha256:eae1785a4c88b8a55c21f38e7b0044519845f9cb72d72e5e2de18957570f2d0c", size = 250113, upload-time = "2026-11-05T10:23:58.379Z" },
 ]
 
 [package.optional-dependencies]
